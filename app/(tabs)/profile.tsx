@@ -44,7 +44,7 @@ export default function ProfileScreen() {
           <View style={styles.avatarContainer}>
             <Text style={styles.avatarEmoji}>🎯</Text>
           </View>
-          <Text style={styles.userName}>Habit Tracker</Text>
+          <Text style={styles.userName}>BetterMe Daily</Text>
           <Text style={styles.userSubtitle}>Building better habits</Text>
         </Animated.View>
 
@@ -113,7 +113,7 @@ export default function ProfileScreen() {
           <Text style={styles.sectionTitle}>About</Text>
           <View style={styles.card}>
             <Text style={styles.aboutText}>
-              Welcome to your habit tracker! This app helps you build and maintain positive habits by tracking your daily progress.
+              Welcome to BetterMe Daily! This app helps you build and maintain positive habits by tracking your daily progress.
             </Text>
             <Text style={styles.aboutText}>
               Set goals, track your streaks, and watch yourself grow one day at a time.
