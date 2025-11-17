@@ -75,7 +75,7 @@ export default function HabitDetailsScreen() {
       const confirmed = window.confirm('Are you sure you want to delete this habit?');
       if (confirmed && habit) {
         deleteHabit(habit.id);
-        router.back();
+        router.replace('/');
       }
     } else {
       Alert.alert(
@@ -92,7 +92,7 @@ export default function HabitDetailsScreen() {
                 if (Platform.OS !== 'web') {
                   Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                 }
-                router.back();
+                router.replace('/');
               }
             },
           },
