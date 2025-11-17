@@ -1,91 +1,237 @@
-import React from "react";
-import { View, Text, StyleSheet, ScrollView, Platform } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { IconSymbol } from "@/components/IconSymbol";
-import { GlassView } from "expo-glass-effect";
-import { useTheme } from "@react-navigation/native";
+
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
+import { colors } from '@/styles/commonStyles';
+import { useHabits } from '@/hooks/useHabits';
+import { IconSymbol } from '@/components/IconSymbol';
+import { calculateHabitStats } from '@/utils/habitHelpers';
 
 export default function ProfileScreen() {
-  const theme = useTheme();
+  const { habits } = useHabits();
+
+  const totalHabits = habits.length;
+  const totalCompletions = habits.reduce((sum, habit) => {
+    const stats = calculateHabitStats(habit);
+    return sum + stats.totalCompletions;
+  }, 0);
+
+  const averageStreak = habits.length > 0
+    ? Math.round(
+        habits.reduce((sum, habit) => {
+          const stats = calculateHabitStats(habit);
+          return sum + stats.currentStreak;
+        }, 0) / habits.length
+      )
+    : 0;
+
+  const bestStreak = habits.reduce((max, habit) => {
+    const stats = calculateHabitStats(habit);
+    return Math.max(max, stats.longestStreak);
+  }, 0);
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.colors.background }]} edges={['top']}>
+    <View style={styles.container}>
       <ScrollView
-        style={styles.container}
-        contentContainerStyle={[
-          styles.contentContainer,
-          Platform.OS !== 'ios' && styles.contentContainerWithTabBar
-        ]}
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
       >
-        <GlassView style={[
-          styles.profileHeader,
-          Platform.OS !== 'ios' && { backgroundColor: theme.dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }
-        ]} glassEffectStyle="regular">
-          <IconSymbol ios_icon_name="person.circle.fill" android_material_icon_name="person" size={80} color={theme.colors.primary} />
-          <Text style={[styles.name, { color: theme.colors.text }]}>John Doe</Text>
-          <Text style={[styles.email, { color: theme.dark ? '#98989D' : '#666' }]}>john.doe@example.com</Text>
-        </GlassView>
+        <View style={styles.header}>
+          <View style={styles.avatarContainer}>
+            <Text style={styles.avatarEmoji}>🎯</Text>
+          </View>
+          <Text style={styles.userName}>Habit Tracker</Text>
+          <Text style={styles.userSubtitle}>Building better habits</Text>
+        </View>
 
-        <GlassView style={[
-          styles.section,
-          Platform.OS !== 'ios' && { backgroundColor: theme.dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }
-        ]} glassEffectStyle="regular">
-          <View style={styles.infoRow}>
-            <IconSymbol ios_icon_name="phone.fill" android_material_icon_name="phone" size={20} color={theme.dark ? '#98989D' : '#666'} />
-            <Text style={[styles.infoText, { color: theme.colors.text }]}>+1 (555) 123-4567</Text>
+        <View style={styles.statsGrid}>
+          <View style={styles.statCard}>
+            <IconSymbol
+              ios_icon_name="list.bullet"
+              android_material_icon_name="list"
+              size={28}
+              color={colors.primary}
+            />
+            <Text style={styles.statValue}>{totalHabits}</Text>
+            <Text style={styles.statLabel}>Total Habits</Text>
           </View>
-          <View style={styles.infoRow}>
-            <IconSymbol ios_icon_name="location.fill" android_material_icon_name="location-on" size={20} color={theme.dark ? '#98989D' : '#666'} />
-            <Text style={[styles.infoText, { color: theme.colors.text }]}>San Francisco, CA</Text>
+
+          <View style={styles.statCard}>
+            <IconSymbol
+              ios_icon_name="checkmark.circle.fill"
+              android_material_icon_name="check-circle"
+              size={28}
+              color={colors.success}
+            />
+            <Text style={styles.statValue}>{totalCompletions}</Text>
+            <Text style={styles.statLabel}>Completions</Text>
           </View>
-        </GlassView>
+
+          <View style={styles.statCard}>
+            <IconSymbol
+              ios_icon_name="flame.fill"
+              android_material_icon_name="local-fire-department"
+              size={28}
+              color={colors.accent}
+            />
+            <Text style={styles.statValue}>{averageStreak}</Text>
+            <Text style={styles.statLabel}>Avg Streak</Text>
+          </View>
+
+          <View style={styles.statCard}>
+            <IconSymbol
+              ios_icon_name="trophy.fill"
+              android_material_icon_name="emoji-events"
+              size={28}
+              color={colors.highlight}
+            />
+            <Text style={styles.statValue}>{bestStreak}</Text>
+            <Text style={styles.statLabel}>Best Streak</Text>
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>About</Text>
+          <View style={styles.card}>
+            <Text style={styles.aboutText}>
+              Welcome to your habit tracker! This app helps you build and maintain positive habits by tracking your daily progress.
+            </Text>
+            <Text style={styles.aboutText}>
+              Set goals, track your streaks, and watch yourself grow one day at a time.
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Tips for Success</Text>
+          <View style={styles.card}>
+            <View style={styles.tipItem}>
+              <Text style={styles.tipEmoji}>💡</Text>
+              <Text style={styles.tipText}>Start small - consistency beats intensity</Text>
+            </View>
+            <View style={styles.tipItem}>
+              <Text style={styles.tipEmoji}>📅</Text>
+              <Text style={styles.tipText}>Track daily to build momentum</Text>
+            </View>
+            <View style={styles.tipItem}>
+              <Text style={styles.tipEmoji}>🎯</Text>
+              <Text style={styles.tipText}>Focus on a few key habits at a time</Text>
+            </View>
+            <View style={styles.tipItem}>
+              <Text style={styles.tipEmoji}>🔥</Text>
+              <Text style={styles.tipText}>Don&apos;t break the chain!</Text>
+            </View>
+          </View>
+        </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    // backgroundColor handled dynamically
-  },
   container: {
     flex: 1,
+    backgroundColor: colors.background,
   },
-  contentContainer: {
-    padding: 20,
+  scrollView: {
+    flex: 1,
   },
-  contentContainerWithTabBar: {
-    paddingBottom: 100, // Extra padding for floating tab bar
+  scrollContent: {
+    paddingTop: Platform.OS === 'android' ? 48 : 16,
+    paddingHorizontal: 16,
+    paddingBottom: 100,
   },
-  profileHeader: {
+  header: {
     alignItems: 'center',
-    borderRadius: 12,
-    padding: 32,
+    paddingVertical: 32,
+  },
+  avatarContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: colors.card,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 16,
-    gap: 12,
+    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+    elevation: 4,
   },
-  name: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    // color handled dynamically
+  avatarEmoji: {
+    fontSize: 48,
   },
-  email: {
+  userName: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 4,
+  },
+  userSubtitle: {
     fontSize: 16,
-    // color handled dynamically
+    color: colors.textSecondary,
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginBottom: 24,
+  },
+  statCard: {
+    flex: 1,
+    minWidth: '45%',
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
+    boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
+    elevation: 2,
+  },
+  statValue: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: colors.text,
+    marginTop: 8,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginTop: 4,
+    textAlign: 'center',
   },
   section: {
-    borderRadius: 12,
-    padding: 20,
-    gap: 12,
+    marginBottom: 24,
   },
-  infoRow: {
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 12,
+  },
+  card: {
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: 20,
+    boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
+    elevation: 2,
+  },
+  aboutText: {
+    fontSize: 16,
+    color: colors.text,
+    lineHeight: 24,
+    marginBottom: 12,
+  },
+  tipItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    marginBottom: 16,
   },
-  infoText: {
+  tipEmoji: {
+    fontSize: 24,
+    marginRight: 12,
+  },
+  tipText: {
+    flex: 1,
     fontSize: 16,
-    // color handled dynamically
+    color: colors.text,
+    lineHeight: 22,
   },
 });

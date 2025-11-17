@@ -1,22 +1,74 @@
-import React from "react";
-import { FlatList, StyleSheet, View } from "react-native";
-import { useTheme } from "@react-navigation/native";
-import { modalDemos } from "@/components/homeData";
-import { DemoCard } from "@/components/DemoCard";
+
+import React from 'react';
+import { View, StyleSheet, ScrollView, Pressable, Text, ActivityIndicator, Platform } from 'react-native';
+import { useRouter } from 'expo-router';
+import { colors } from '@/styles/commonStyles';
+import { useHabits } from '@/hooks/useHabits';
+import { HabitCard } from '@/components/HabitCard';
+import { EmptyState } from '@/components/EmptyState';
+import { IconSymbol } from '@/components/IconSymbol';
 
 export default function HomeScreen() {
-  const theme = useTheme();
+  const router = useRouter();
+  const { habits, loading, toggleHabitCompletion } = useHabits();
+
+  const handleAddHabit = () => {
+    router.push('/add-habit');
+  };
+
+  const handleHabitPress = (habitId: string) => {
+    router.push(`/habit-details?id=${habitId}`);
+  };
+
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.centerContent]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <FlatList
-        data={modalDemos}
-        renderItem={({ item }) => <DemoCard item={item} />}
-        keyExtractor={(item) => item.route}
-        contentContainerStyle={styles.listContainer}
-        contentInsetAdjustmentBehavior="automatic"
+    <View style={styles.container}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
-      />
+      >
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>My Habits</Text>
+          <Text style={styles.headerSubtitle}>Build better habits, one day at a time</Text>
+        </View>
+
+        {habits.length === 0 ? (
+          <EmptyState
+            icon="🎯"
+            title="No habits yet"
+            message="Start building better habits by adding your first one!"
+          />
+        ) : (
+          <View style={styles.habitsList}>
+            {habits.map((habit, index) => (
+              <React.Fragment key={index}>
+                <HabitCard
+                  habit={habit}
+                  onPress={() => handleHabitPress(habit.id)}
+                  onToggle={() => toggleHabitCompletion(habit.id)}
+                />
+              </React.Fragment>
+            ))}
+          </View>
+        )}
+      </ScrollView>
+
+      <Pressable style={styles.fab} onPress={handleAddHabit}>
+        <IconSymbol
+          ios_icon_name="plus"
+          android_material_icon_name="add"
+          size={28}
+          color="#FFFFFF"
+        />
+      </Pressable>
     </View>
   );
 }
@@ -24,10 +76,47 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.background,
   },
-  listContainer: {
-    paddingTop: 48,
+  centerContent: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingTop: Platform.OS === 'android' ? 48 : 16,
     paddingHorizontal: 16,
-    paddingBottom: 100, // Extra padding for floating tab bar
+    paddingBottom: 120,
+  },
+  header: {
+    marginBottom: 24,
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: colors.text,
+    marginBottom: 4,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: colors.textSecondary,
+  },
+  habitsList: {
+    flex: 1,
+  },
+  fab: {
+    position: 'absolute',
+    right: 20,
+    bottom: 100,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
+    elevation: 6,
   },
 });
