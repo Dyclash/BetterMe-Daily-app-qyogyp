@@ -8,6 +8,7 @@ import {
   Pressable,
   Alert,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { colors } from '@/styles/commonStyles';
@@ -22,6 +23,17 @@ export default function HabitDetailsScreen() {
   const { id } = useLocalSearchParams();
   const { habits, deleteHabit } = useHabits();
   const [habit, setHabit] = useState<Habit | null>(null);
+  const { width: screenWidth } = useWindowDimensions();
+
+  // Responsive sizing
+  const isSmallScreen = screenWidth < 375;
+  const fontSize = {
+    habitName: isSmallScreen ? 24 : 28,
+    habitDescription: isSmallScreen ? 14 : 16,
+    statValue: isSmallScreen ? 28 : 32,
+    statLabel: isSmallScreen ? 11 : 12,
+    sectionTitle: isSmallScreen ? 18 : 20,
+  };
 
   useEffect(() => {
     const foundHabit = habits.find(h => h.id === id);
@@ -74,7 +86,11 @@ export default function HabitDetailsScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.headerButton}>
+        <Pressable 
+          onPress={() => router.back()} 
+          style={styles.headerButton}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
           <IconSymbol
             ios_icon_name="chevron.left"
             android_material_icon_name="arrow-back"
@@ -83,7 +99,11 @@ export default function HabitDetailsScreen() {
           />
         </Pressable>
         <Text style={styles.headerTitle}>Habit Details</Text>
-        <Pressable onPress={handleDelete} style={styles.headerButton}>
+        <Pressable 
+          onPress={handleDelete} 
+          style={styles.headerButton}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
           <IconSymbol
             ios_icon_name="trash"
             android_material_icon_name="delete"
@@ -93,12 +113,20 @@ export default function HabitDetailsScreen() {
         </Pressable>
       </View>
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+      <ScrollView 
+        style={styles.scrollView} 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={[styles.habitHeader, { backgroundColor: habit.color }]}>
           <Text style={styles.habitIcon}>{habit.icon}</Text>
-          <Text style={styles.habitName}>{habit.name}</Text>
+          <Text style={[styles.habitName, { fontSize: fontSize.habitName }]}>
+            {habit.name}
+          </Text>
           {habit.description && (
-            <Text style={styles.habitDescription}>{habit.description}</Text>
+            <Text style={[styles.habitDescription, { fontSize: fontSize.habitDescription }]}>
+              {habit.description}
+            </Text>
           )}
         </View>
 
@@ -110,8 +138,12 @@ export default function HabitDetailsScreen() {
               size={32}
               color={colors.accent}
             />
-            <Text style={styles.statValue}>{stats.currentStreak}</Text>
-            <Text style={styles.statLabel}>Current Streak</Text>
+            <Text style={[styles.statValue, { fontSize: fontSize.statValue }]}>
+              {stats.currentStreak}
+            </Text>
+            <Text style={[styles.statLabel, { fontSize: fontSize.statLabel }]}>
+              Current Streak
+            </Text>
           </View>
 
           <View style={styles.statCard}>
@@ -121,8 +153,12 @@ export default function HabitDetailsScreen() {
               size={32}
               color={colors.primary}
             />
-            <Text style={styles.statValue}>{stats.longestStreak}</Text>
-            <Text style={styles.statLabel}>Longest Streak</Text>
+            <Text style={[styles.statValue, { fontSize: fontSize.statValue }]}>
+              {stats.longestStreak}
+            </Text>
+            <Text style={[styles.statLabel, { fontSize: fontSize.statLabel }]}>
+              Longest Streak
+            </Text>
           </View>
         </View>
 
@@ -134,8 +170,12 @@ export default function HabitDetailsScreen() {
               size={32}
               color={colors.success}
             />
-            <Text style={styles.statValue}>{stats.totalCompletions}</Text>
-            <Text style={styles.statLabel}>Total Completions</Text>
+            <Text style={[styles.statValue, { fontSize: fontSize.statValue }]}>
+              {stats.totalCompletions}
+            </Text>
+            <Text style={[styles.statLabel, { fontSize: fontSize.statLabel }]}>
+              Total Completions
+            </Text>
           </View>
 
           <View style={styles.statCard}>
@@ -145,8 +185,12 @@ export default function HabitDetailsScreen() {
               size={32}
               color={colors.secondary}
             />
-            <Text style={styles.statValue}>{Math.round(stats.completionRate)}%</Text>
-            <Text style={styles.statLabel}>Completion Rate</Text>
+            <Text style={[styles.statValue, { fontSize: fontSize.statValue }]}>
+              {Math.round(stats.completionRate)}%
+            </Text>
+            <Text style={[styles.statLabel, { fontSize: fontSize.statLabel }]}>
+              Completion Rate
+            </Text>
           </View>
         </View>
 
@@ -170,9 +214,13 @@ export default function HabitDetailsScreen() {
         </View>
 
         <View style={styles.recentActivity}>
-          <Text style={styles.sectionTitle}>Recent Activity</Text>
+          <Text style={[styles.sectionTitle, { fontSize: fontSize.sectionTitle }]}>
+            Recent Activity
+          </Text>
           {habit.completions.length === 0 ? (
-            <Text style={styles.emptyText}>No activity yet. Start tracking today!</Text>
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No activity yet. Start tracking today!</Text>
+            </View>
           ) : (
             <View style={styles.activityList}>
               {habit.completions
@@ -216,9 +264,14 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+    minHeight: 60,
   },
   headerButton: {
     padding: 8,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerTitle: {
     fontSize: 18,
@@ -229,7 +282,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 100,
+    paddingBottom: 120,
   },
   habitHeader: {
     padding: 32,
@@ -240,17 +293,16 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   habitName: {
-    fontSize: 28,
     fontWeight: '700',
     color: '#FFFFFF',
     marginBottom: 8,
     textAlign: 'center',
   },
   habitDescription: {
-    fontSize: 16,
     color: '#FFFFFF',
     opacity: 0.9,
     textAlign: 'center',
+    lineHeight: 22,
   },
   statsContainer: {
     flexDirection: 'row',
@@ -264,17 +316,27 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     alignItems: 'center',
-    boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
-    elevation: 2,
+    minHeight: 120,
+    justifyContent: 'center',
+    ...Platform.select({
+      web: {
+        boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
+      },
+      default: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+        elevation: 2,
+      }
+    }),
   },
   statValue: {
-    fontSize: 32,
     fontWeight: '700',
     color: colors.text,
     marginTop: 8,
   },
   statLabel: {
-    fontSize: 12,
     color: colors.textSecondary,
     marginTop: 4,
     textAlign: 'center',
@@ -285,8 +347,18 @@ const styles = StyleSheet.create({
     padding: 20,
     marginHorizontal: 16,
     marginTop: 16,
-    boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
-    elevation: 2,
+    ...Platform.select({
+      web: {
+        boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
+      },
+      default: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+        elevation: 2,
+      }
+    }),
   },
   infoRow: {
     flexDirection: 'row',
@@ -294,6 +366,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+    minHeight: 48,
+    alignItems: 'center',
   },
   infoLabel: {
     fontSize: 16,
@@ -309,23 +383,50 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   sectionTitle: {
-    fontSize: 20,
     fontWeight: '700',
     color: colors.text,
     marginBottom: 16,
+  },
+  emptyContainer: {
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: 32,
+    alignItems: 'center',
+    ...Platform.select({
+      web: {
+        boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
+      },
+      default: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+        elevation: 2,
+      }
+    }),
   },
   emptyText: {
     fontSize: 16,
     color: colors.textSecondary,
     textAlign: 'center',
-    paddingVertical: 32,
+    lineHeight: 22,
   },
   activityList: {
     backgroundColor: colors.card,
     borderRadius: 16,
     padding: 16,
-    boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
-    elevation: 2,
+    ...Platform.select({
+      web: {
+        boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
+      },
+      default: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+        elevation: 2,
+      }
+    }),
   },
   activityItem: {
     flexDirection: 'row',
@@ -334,6 +435,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+    minHeight: 48,
   },
   activityDate: {
     fontSize: 16,
@@ -343,7 +445,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderRadius: 12,
     paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingVertical: 6,
+    minWidth: 44,
+    minHeight: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   activityCount: {
     fontSize: 14,

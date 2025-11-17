@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { View, StyleSheet, ScrollView, Pressable, Text, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ScrollView, Pressable, Text, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { colors } from '@/styles/commonStyles';
 import { useHabits } from '@/hooks/useHabits';
@@ -11,6 +11,16 @@ import { IconSymbol } from '@/components/IconSymbol';
 export default function HomeScreen() {
   const router = useRouter();
   const { habits, loading, toggleHabitCompletion } = useHabits();
+  const { width: screenWidth } = useWindowDimensions();
+
+  // Responsive sizing
+  const isSmallScreen = screenWidth < 375;
+  const headerFontSize = {
+    title: isSmallScreen ? 28 : 32,
+    subtitle: isSmallScreen ? 14 : 16,
+  };
+  const fabSize = isSmallScreen ? 52 : 56;
+  const fabBottom = isSmallScreen ? 90 : 100;
 
   const handleAddHabit = () => {
     router.push('/add-habit');
@@ -22,7 +32,7 @@ export default function HomeScreen() {
 
   if (loading) {
     return (
-      <>
+      <React.Fragment>
         <Stack.Screen
           options={{
             title: 'My Habits',
@@ -32,12 +42,12 @@ export default function HomeScreen() {
         <View style={[styles.container, styles.centerContent]}>
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
-      </>
+      </React.Fragment>
     );
   }
 
   return (
-    <>
+    <React.Fragment>
       <Stack.Screen
         options={{
           title: 'My Habits',
@@ -71,7 +81,19 @@ export default function HomeScreen() {
           )}
         </ScrollView>
 
-        <Pressable style={styles.fab} onPress={handleAddHabit}>
+        <Pressable 
+          style={[
+            styles.fab, 
+            { 
+              width: fabSize, 
+              height: fabSize, 
+              borderRadius: fabSize / 2,
+              bottom: fabBottom,
+            }
+          ]} 
+          onPress={handleAddHabit}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
           <IconSymbol
             ios_icon_name="plus"
             android_material_icon_name="add"
@@ -80,7 +102,7 @@ export default function HomeScreen() {
           />
         </Pressable>
       </View>
-    </>
+    </React.Fragment>
   );
 }
 
@@ -99,7 +121,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 120,
+    paddingBottom: 140,
   },
   habitsList: {
     flex: 1,
@@ -107,14 +129,13 @@ const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
     right: 20,
-    bottom: 100,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
-    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
 });

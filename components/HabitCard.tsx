@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, Platform } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Platform, useWindowDimensions } from 'react-native';
 import { Habit } from '@/types/habit';
 import { IconSymbol } from '@/components/IconSymbol';
 import { colors } from '@/styles/commonStyles';
@@ -15,10 +15,22 @@ interface HabitCardProps {
   onToggle: () => void;
 }
 
-export function HabitCard({ habit, onPress, onToggle }: HabitCardProps) {
+export const HabitCard = React.memo(({ habit, onPress, onToggle }: HabitCardProps) => {
+  const { width: screenWidth } = useWindowDimensions();
   const progress = getProgressPercentage(habit);
   const streak = calculateStreak(habit);
   const isCompleted = progress >= 100;
+
+  // Responsive sizing based on screen width
+  const isSmallScreen = screenWidth < 375;
+  const cardPadding = isSmallScreen ? 12 : 16;
+  const iconSize = isSmallScreen ? 40 : 48;
+  const fontSize = {
+    habitName: isSmallScreen ? 16 : 18,
+    habitDescription: isSmallScreen ? 12 : 14,
+    progressText: isSmallScreen ? 11 : 12,
+    statText: isSmallScreen ? 11 : 12,
+  };
 
   const handleToggle = () => {
     if (Platform.OS !== 'web') {
@@ -57,29 +69,36 @@ export function HabitCard({ habit, onPress, onToggle }: HabitCardProps) {
           style={styles.blurContainer}
           experimentalBlurMethod={Platform.OS === 'android' ? 'dimezisBlurView' : 'none'}
         >
-          <View style={styles.card}>
+          <View style={[styles.card, { padding: cardPadding }]}>
             <View style={styles.header}>
               <View style={[styles.iconContainer, { 
+                width: iconSize,
+                height: iconSize,
+                borderRadius: iconSize / 2,
                 backgroundColor: `${habit.color}20`,
                 borderColor: `${habit.color}40`,
                 borderWidth: 1,
               }]}>
-                <Text style={styles.icon}>{habit.icon}</Text>
+                <Text style={[styles.icon, { fontSize: iconSize * 0.5 }]}>{habit.icon}</Text>
               </View>
               <View style={styles.headerContent}>
-                <Text style={styles.habitName}>{habit.name}</Text>
+                <Text style={[styles.habitName, { fontSize: fontSize.habitName }]}>{habit.name}</Text>
                 {habit.description && (
-                  <Text style={styles.habitDescription} numberOfLines={1}>
+                  <Text style={[styles.habitDescription, { fontSize: fontSize.habitDescription }]} numberOfLines={1}>
                     {habit.description}
                   </Text>
                 )}
               </View>
               <Animated.View style={scaleStyle}>
-                <Pressable onPress={handleToggle} style={styles.checkButton}>
+                <Pressable 
+                  onPress={handleToggle} 
+                  style={styles.checkButton}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
                   <IconSymbol
                     ios_icon_name={isCompleted ? 'checkmark.circle.fill' : 'circle'}
                     android_material_icon_name={isCompleted ? 'check-circle' : 'radio-button-unchecked'}
-                    size={32}
+                    size={36}
                     color={isCompleted ? colors.success : colors.textSecondary}
                   />
                 </Pressable>
@@ -104,7 +123,9 @@ export function HabitCard({ habit, onPress, onToggle }: HabitCardProps) {
                   })
                 }]} />
               </View>
-              <Text style={styles.progressText}>{Math.round(progress)}%</Text>
+              <Text style={[styles.progressText, { fontSize: fontSize.progressText }]}>
+                {Math.round(progress)}%
+              </Text>
             </View>
 
             <View style={styles.footer}>
@@ -115,7 +136,9 @@ export function HabitCard({ habit, onPress, onToggle }: HabitCardProps) {
                   size={16}
                   color={colors.accent}
                 />
-                <Text style={styles.statText}>{streak} day streak</Text>
+                <Text style={[styles.statText, { fontSize: fontSize.statText }]}>
+                  {streak} day streak
+                </Text>
               </View>
               <View style={styles.statItem}>
                 <IconSymbol
@@ -124,7 +147,7 @@ export function HabitCard({ habit, onPress, onToggle }: HabitCardProps) {
                   size={16}
                   color={colors.primary}
                 />
-                <Text style={styles.statText}>
+                <Text style={[styles.statText, { fontSize: fontSize.statText }]}>
                   {habit.targetCount}x {habit.frequency}
                 </Text>
               </View>
@@ -134,7 +157,9 @@ export function HabitCard({ habit, onPress, onToggle }: HabitCardProps) {
       </View>
     </Pressable>
   );
-}
+});
+
+HabitCard.displayName = 'HabitCard';
 
 const styles = StyleSheet.create({
   container: {
@@ -157,7 +182,6 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: 'rgba(255, 255, 255, 0.25)',
-    padding: 16,
   },
   header: {
     flexDirection: 'row',
@@ -165,31 +189,31 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
   },
   icon: {
-    fontSize: 24,
+    // fontSize set dynamically
   },
   headerContent: {
     flex: 1,
+    marginRight: 8,
   },
   habitName: {
-    fontSize: 18,
     fontWeight: '600',
     color: colors.text,
     marginBottom: 2,
   },
   habitDescription: {
-    fontSize: 14,
     color: colors.textSecondary,
   },
   checkButton: {
     padding: 4,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   progressContainer: {
     flexDirection: 'row',
@@ -211,7 +235,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   progressText: {
-    fontSize: 12,
     fontWeight: '600',
     color: colors.text,
     minWidth: 40,
@@ -227,7 +250,6 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   statText: {
-    fontSize: 12,
     color: colors.textSecondary,
     marginLeft: 4,
   },

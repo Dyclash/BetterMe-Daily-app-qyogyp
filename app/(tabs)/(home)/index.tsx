@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { View, StyleSheet, ScrollView, Pressable, Text, ActivityIndicator, Platform } from 'react-native';
+import { View, StyleSheet, ScrollView, Pressable, Text, ActivityIndicator, Platform, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { colors } from '@/styles/commonStyles';
 import { useHabits } from '@/hooks/useHabits';
@@ -11,6 +11,16 @@ import { IconSymbol } from '@/components/IconSymbol';
 export default function HomeScreen() {
   const router = useRouter();
   const { habits, loading, toggleHabitCompletion } = useHabits();
+  const { width: screenWidth } = useWindowDimensions();
+
+  // Responsive sizing
+  const isSmallScreen = screenWidth < 375;
+  const headerFontSize = {
+    title: isSmallScreen ? 28 : 32,
+    subtitle: isSmallScreen ? 14 : 16,
+  };
+  const fabSize = isSmallScreen ? 52 : 56;
+  const fabBottom = isSmallScreen ? 90 : 100;
 
   const handleAddHabit = () => {
     router.push('/add-habit');
@@ -36,8 +46,12 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>My Habits</Text>
-          <Text style={styles.headerSubtitle}>Build better habits, one day at a time</Text>
+          <Text style={[styles.headerTitle, { fontSize: headerFontSize.title }]}>
+            My Habits
+          </Text>
+          <Text style={[styles.headerSubtitle, { fontSize: headerFontSize.subtitle }]}>
+            Build better habits, one day at a time
+          </Text>
         </View>
 
         {habits.length === 0 ? (
@@ -61,7 +75,19 @@ export default function HomeScreen() {
         )}
       </ScrollView>
 
-      <Pressable style={styles.fab} onPress={handleAddHabit}>
+      <Pressable 
+        style={[
+          styles.fab, 
+          { 
+            width: fabSize, 
+            height: fabSize, 
+            borderRadius: fabSize / 2,
+            bottom: fabBottom,
+          }
+        ]} 
+        onPress={handleAddHabit}
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      >
         <IconSymbol
           ios_icon_name="plus"
           android_material_icon_name="add"
@@ -86,22 +112,22 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingTop: Platform.OS === 'android' ? 48 : 16,
+    paddingTop: Platform.OS === 'android' ? 56 : 16,
     paddingHorizontal: 16,
-    paddingBottom: 120,
+    paddingBottom: 140,
   },
   header: {
     marginBottom: 24,
+    paddingHorizontal: 4,
   },
   headerTitle: {
-    fontSize: 32,
     fontWeight: '800',
     color: colors.text,
     marginBottom: 4,
   },
   headerSubtitle: {
-    fontSize: 16,
     color: colors.textSecondary,
+    lineHeight: 22,
   },
   habitsList: {
     flex: 1,
@@ -109,14 +135,20 @@ const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
     right: 20,
-    bottom: 100,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
-    elevation: 6,
+    ...Platform.select({
+      web: {
+        boxShadow: '0px 4px 16px rgba(0, 0, 0, 0.2)',
+      },
+      default: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8,
+      }
+    }),
   },
 });

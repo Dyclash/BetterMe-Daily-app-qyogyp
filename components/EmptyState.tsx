@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
 import { IconSymbol } from '@/components/IconSymbol';
 import { colors } from '@/styles/commonStyles';
 
@@ -10,17 +10,37 @@ interface EmptyStateProps {
   message: string;
 }
 
-export function EmptyState({ icon, title, message }: EmptyStateProps) {
+export const EmptyState = React.memo(({ icon, title, message }: EmptyStateProps) => {
+  const { width: screenWidth } = useWindowDimensions();
+
+  // Responsive sizing
+  const isSmallScreen = screenWidth < 375;
+  const iconContainerSize = isSmallScreen ? 72 : 80;
+  const fontSize = {
+    icon: isSmallScreen ? 36 : 40,
+    title: isSmallScreen ? 18 : 20,
+    message: isSmallScreen ? 14 : 16,
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.iconContainer}>
-        <Text style={styles.icon}>{icon}</Text>
+      <View style={[
+        styles.iconContainer,
+        {
+          width: iconContainerSize,
+          height: iconContainerSize,
+          borderRadius: iconContainerSize / 2,
+        }
+      ]}>
+        <Text style={[styles.icon, { fontSize: fontSize.icon }]}>{icon}</Text>
       </View>
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.message}>{message}</Text>
+      <Text style={[styles.title, { fontSize: fontSize.title }]}>{title}</Text>
+      <Text style={[styles.message, { fontSize: fontSize.message }]}>{message}</Text>
     </View>
   );
-}
+});
+
+EmptyState.displayName = 'EmptyState';
 
 const styles = StyleSheet.create({
   container: {
@@ -28,28 +48,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 32,
+    paddingVertical: 48,
   },
   iconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
     backgroundColor: colors.background,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
   },
   icon: {
-    fontSize: 40,
+    // fontSize set dynamically
   },
   title: {
-    fontSize: 20,
     fontWeight: '700',
     color: colors.text,
     marginBottom: 8,
     textAlign: 'center',
   },
   message: {
-    fontSize: 16,
     color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 22,

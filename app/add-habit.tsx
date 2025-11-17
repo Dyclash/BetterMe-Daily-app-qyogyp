@@ -8,6 +8,10 @@ import {
   ScrollView,
   Pressable,
   Platform,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
+  useWindowDimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { colors } from '@/styles/commonStyles';
@@ -35,6 +39,7 @@ const HABIT_COLORS = [
 export default function AddHabitScreen() {
   const router = useRouter();
   const { addHabit } = useHabits();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -42,6 +47,11 @@ export default function AddHabitScreen() {
   const [targetCount, setTargetCount] = useState('1');
   const [selectedIcon, setSelectedIcon] = useState(HABIT_ICONS[0]);
   const [selectedColor, setSelectedColor] = useState(HABIT_COLORS[0]);
+
+  // Responsive sizing
+  const isSmallScreen = screenWidth < 375;
+  const iconButtonSize = isSmallScreen ? 52 : 56;
+  const colorButtonSize = isSmallScreen ? 44 : 48;
 
   const handleSave = async () => {
     if (!name.trim()) {
@@ -70,131 +80,188 @@ export default function AddHabitScreen() {
   };
 
   const handleCancel = () => {
+    Keyboard.dismiss();
     router.back();
   };
 
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Pressable onPress={handleCancel} style={styles.headerButton}>
-          <Text style={styles.headerButtonText}>Cancel</Text>
-        </Pressable>
-        <Text style={styles.headerTitle}>New Habit</Text>
-        <Pressable onPress={handleSave} style={styles.headerButton}>
-          <Text style={[styles.headerButtonText, styles.saveButton]}>Save</Text>
-        </Pressable>
-      </View>
-
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.section}>
-          <Text style={styles.label}>Habit Name</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="e.g., Morning Exercise"
-            placeholderTextColor={colors.textSecondary}
-            value={name}
-            onChangeText={setName}
-          />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.label}>Description (Optional)</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            placeholder="Add a description..."
-            placeholderTextColor={colors.textSecondary}
-            value={description}
-            onChangeText={setDescription}
-            multiline
-            numberOfLines={3}
-          />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.label}>Frequency</Text>
-          <View style={styles.frequencyContainer}>
-            {(['daily', 'weekly', 'monthly'] as HabitFrequency[]).map((freq, index) => (
-              <React.Fragment key={index}>
-                <Pressable
-                  style={[
-                    styles.frequencyButton,
-                    frequency === freq && styles.frequencyButtonActive,
-                  ]}
-                  onPress={() => setFrequency(freq)}
-                >
-                  <Text
-                    style={[
-                      styles.frequencyButtonText,
-                      frequency === freq && styles.frequencyButtonTextActive,
-                    ]}
-                  >
-                    {freq.charAt(0).toUpperCase() + freq.slice(1)}
-                  </Text>
-                </Pressable>
-              </React.Fragment>
-            ))}
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+    >
+      <TouchableWithoutFeedback onPress={dismissKeyboard}>
+        <View style={styles.innerContainer}>
+          <View style={styles.header}>
+            <Pressable 
+              onPress={handleCancel} 
+              style={styles.headerButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Text style={styles.headerButtonText}>Cancel</Text>
+            </Pressable>
+            <Text style={styles.headerTitle}>New Habit</Text>
+            <Pressable 
+              onPress={handleSave} 
+              style={styles.headerButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Text style={[styles.headerButtonText, styles.saveButton]}>Save</Text>
+            </Pressable>
           </View>
-        </View>
 
-        <View style={styles.section}>
-          <Text style={styles.label}>Target Count</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="1"
-            placeholderTextColor={colors.textSecondary}
-            value={targetCount}
-            onChangeText={setTargetCount}
-            keyboardType="number-pad"
-          />
-        </View>
+          <ScrollView 
+            style={styles.scrollView} 
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.section}>
+              <Text style={styles.label}>Habit Name</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="e.g., Morning Exercise"
+                placeholderTextColor={colors.textSecondary}
+                value={name}
+                onChangeText={setName}
+                returnKeyType="next"
+                blurOnSubmit={false}
+              />
+            </View>
 
-        <View style={styles.section}>
-          <Text style={styles.label}>Choose Icon</Text>
-          <View style={styles.iconGrid}>
-            {HABIT_ICONS.map((icon, index) => (
-              <React.Fragment key={index}>
-                <Pressable
-                  style={[
-                    styles.iconButton,
-                    selectedIcon === icon && styles.iconButtonActive,
-                  ]}
-                  onPress={() => setSelectedIcon(icon)}
-                >
-                  <Text style={styles.iconText}>{icon}</Text>
-                </Pressable>
-              </React.Fragment>
-            ))}
-          </View>
-        </View>
+            <View style={styles.section}>
+              <Text style={styles.label}>Description (Optional)</Text>
+              <TextInput
+                style={[styles.input, styles.textArea]}
+                placeholder="Add a description..."
+                placeholderTextColor={colors.textSecondary}
+                value={description}
+                onChangeText={setDescription}
+                multiline
+                numberOfLines={3}
+                textAlignVertical="top"
+                returnKeyType="done"
+              />
+            </View>
 
-        <View style={styles.section}>
-          <Text style={styles.label}>Choose Color</Text>
-          <View style={styles.colorGrid}>
-            {HABIT_COLORS.map((color, index) => (
-              <React.Fragment key={index}>
-                <Pressable
-                  style={[
-                    styles.colorButton,
-                    { backgroundColor: color },
-                    selectedColor === color && styles.colorButtonActive,
-                  ]}
-                  onPress={() => setSelectedColor(color)}
-                >
-                  {selectedColor === color && (
-                    <IconSymbol
-                      ios_icon_name="checkmark"
-                      android_material_icon_name="check"
-                      size={20}
-                      color="#FFFFFF"
-                    />
-                  )}
-                </Pressable>
-              </React.Fragment>
-            ))}
-          </View>
+            <View style={styles.section}>
+              <Text style={styles.label}>Frequency</Text>
+              <View style={styles.frequencyContainer}>
+                {(['daily', 'weekly', 'monthly'] as HabitFrequency[]).map((freq, index) => (
+                  <React.Fragment key={index}>
+                    <Pressable
+                      style={[
+                        styles.frequencyButton,
+                        frequency === freq && styles.frequencyButtonActive,
+                      ]}
+                      onPress={() => {
+                        setFrequency(freq);
+                        if (Platform.OS !== 'web') {
+                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        }
+                      }}
+                      hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
+                    >
+                      <Text
+                        style={[
+                          styles.frequencyButtonText,
+                          frequency === freq && styles.frequencyButtonTextActive,
+                        ]}
+                      >
+                        {freq.charAt(0).toUpperCase() + freq.slice(1)}
+                      </Text>
+                    </Pressable>
+                  </React.Fragment>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.label}>Target Count</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="1"
+                placeholderTextColor={colors.textSecondary}
+                value={targetCount}
+                onChangeText={setTargetCount}
+                keyboardType="number-pad"
+                returnKeyType="done"
+              />
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.label}>Choose Icon</Text>
+              <View style={styles.iconGrid}>
+                {HABIT_ICONS.map((icon, index) => (
+                  <React.Fragment key={index}>
+                    <Pressable
+                      style={[
+                        styles.iconButton,
+                        { width: iconButtonSize, height: iconButtonSize },
+                        selectedIcon === icon && styles.iconButtonActive,
+                      ]}
+                      onPress={() => {
+                        setSelectedIcon(icon);
+                        if (Platform.OS !== 'web') {
+                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        }
+                      }}
+                      hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
+                    >
+                      <Text style={[styles.iconText, { fontSize: iconButtonSize * 0.5 }]}>
+                        {icon}
+                      </Text>
+                    </Pressable>
+                  </React.Fragment>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.label}>Choose Color</Text>
+              <View style={styles.colorGrid}>
+                {HABIT_COLORS.map((color, index) => (
+                  <React.Fragment key={index}>
+                    <Pressable
+                      style={[
+                        styles.colorButton,
+                        { 
+                          width: colorButtonSize, 
+                          height: colorButtonSize,
+                          borderRadius: colorButtonSize / 2,
+                          backgroundColor: color 
+                        },
+                        selectedColor === color && styles.colorButtonActive,
+                      ]}
+                      onPress={() => {
+                        setSelectedColor(color);
+                        if (Platform.OS !== 'web') {
+                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        }
+                      }}
+                      hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
+                    >
+                      {selectedColor === color && (
+                        <IconSymbol
+                          ios_icon_name="checkmark"
+                          android_material_icon_name="check"
+                          size={20}
+                          color="#FFFFFF"
+                        />
+                      )}
+                    </Pressable>
+                  </React.Fragment>
+                ))}
+              </View>
+            </View>
+          </ScrollView>
         </View>
-      </ScrollView>
-    </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -202,6 +269,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  innerContainer: {
+    flex: 1,
     paddingTop: Platform.OS === 'android' ? 48 : 0,
   },
   header: {
@@ -212,9 +282,14 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+    minHeight: 60,
   },
   headerButton: {
     padding: 8,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerButtonText: {
     fontSize: 16,
@@ -233,7 +308,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
-    paddingBottom: 100,
+    paddingBottom: 120,
   },
   section: {
     marginBottom: 24,
@@ -252,10 +327,11 @@ const styles = StyleSheet.create({
     color: colors.text,
     borderWidth: 1,
     borderColor: colors.border,
+    minHeight: 52,
   },
   textArea: {
-    minHeight: 80,
-    textAlignVertical: 'top',
+    minHeight: 100,
+    paddingTop: 16,
   },
   frequencyContainer: {
     flexDirection: 'row',
@@ -263,13 +339,15 @@ const styles = StyleSheet.create({
   },
   frequencyButton: {
     flex: 1,
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 12,
     backgroundColor: colors.card,
     borderWidth: 2,
     borderColor: colors.border,
     alignItems: 'center',
+    minHeight: 48,
+    justifyContent: 'center',
   },
   frequencyButtonActive: {
     backgroundColor: colors.primary,
@@ -289,8 +367,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   iconButton: {
-    width: 56,
-    height: 56,
     borderRadius: 12,
     backgroundColor: colors.card,
     borderWidth: 2,
@@ -303,7 +379,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   iconText: {
-    fontSize: 28,
+    // fontSize set dynamically
   },
   colorGrid: {
     flexDirection: 'row',
@@ -311,9 +387,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   colorButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 3,
