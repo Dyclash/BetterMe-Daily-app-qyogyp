@@ -33,6 +33,7 @@ export default function HabitDetailsScreen() {
   const { width: screenWidth } = useWindowDimensions();
   
   const deleteButtonScale = useSharedValue(1);
+  const editButtonScale = useSharedValue(1);
 
   // Responsive sizing
   const isSmallScreen = screenWidth < 375;
@@ -50,6 +51,19 @@ export default function HabitDetailsScreen() {
       setHabit(foundHabit);
     }
   }, [id, habits]);
+
+  const handleEdit = () => {
+    editButtonScale.value = withSpring(0.9, { damping: 10 });
+    setTimeout(() => {
+      editButtonScale.value = withSpring(1, { damping: 10 });
+    }, 100);
+
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+
+    router.push(`/edit-habit?id=${id}`);
+  };
 
   const handleDelete = () => {
     deleteButtonScale.value = withSpring(0.9, { damping: 10 });
@@ -93,6 +107,12 @@ export default function HabitDetailsScreen() {
     };
   });
 
+  const editButtonStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: editButtonScale.value }],
+    };
+  });
+
   if (!habit) {
     return (
       <View style={[styles.container, styles.centerContent]}>
@@ -119,20 +139,36 @@ export default function HabitDetailsScreen() {
           />
         </Pressable>
         <Text style={styles.headerTitle}>Habit Details</Text>
-        <Animated.View style={deleteButtonStyle}>
-          <Pressable 
-            onPress={handleDelete} 
-            style={styles.headerButton}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <IconSymbol
-              ios_icon_name="trash"
-              android_material_icon_name="delete"
-              size={26}
-              color={colors.error}
-            />
-          </Pressable>
-        </Animated.View>
+        <View style={styles.headerActions}>
+          <Animated.View style={editButtonStyle}>
+            <Pressable 
+              onPress={handleEdit} 
+              style={styles.headerButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <IconSymbol
+                ios_icon_name="pencil"
+                android_material_icon_name="edit"
+                size={24}
+                color={colors.primary}
+              />
+            </Pressable>
+          </Animated.View>
+          <Animated.View style={deleteButtonStyle}>
+            <Pressable 
+              onPress={handleDelete} 
+              style={styles.headerButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <IconSymbol
+                ios_icon_name="trash"
+                android_material_icon_name="delete"
+                size={24}
+                color={colors.error}
+              />
+            </Pressable>
+          </Animated.View>
+        </View>
       </View>
 
       <ScrollView 
@@ -330,6 +366,10 @@ const styles = StyleSheet.create({
     minHeight: 44,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  headerActions: {
+    flexDirection: 'row',
+    gap: 8,
   },
   headerTitle: {
     fontSize: 20,
