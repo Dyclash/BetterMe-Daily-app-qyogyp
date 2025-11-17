@@ -1,5 +1,5 @@
 
-import { StyleSheet, ViewStyle, TextStyle } from 'react-native';
+import { StyleSheet, ViewStyle, TextStyle, Platform } from 'react-native';
 
 export const colors = {
   background: '#F5F5DC',
@@ -82,12 +82,46 @@ export const commonStyles = StyleSheet.create({
     padding: 16,
     marginVertical: 8,
     width: '100%',
-    boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)',
-    elevation: 3,
+    ...Platform.select({
+      web: {
+        boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)',
+      },
+      default: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 3,
+      }
+    }),
   },
   icon: {
     width: 60,
     height: 60,
     tintColor: colors.primary,
+  },
+  // Glassmorphism card style
+  glassCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderWidth: 1,
+    borderRadius: 20,
+    padding: 16,
+    marginVertical: 8,
+    width: '100%',
+    overflow: 'hidden',
+    ...Platform.select({
+      web: {
+        backdropFilter: 'blur(10px)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 0 20px rgba(70, 130, 180, 0.2)',
+      },
+      default: {
+        shadowColor: colors.primary,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 12,
+        elevation: 8,
+      }
+    }),
   },
 });

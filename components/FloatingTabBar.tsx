@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   View,
@@ -99,8 +100,6 @@ export default function FloatingTabBar({
     router.push(route);
   };
 
-  // Remove unnecessary tabBarStyle animation to prevent flickering
-
   const tabWidthPercent = ((100 / tabs.length) - 1).toFixed(2);
 
   const indicatorStyle = useAnimatedStyle(() => {
@@ -122,24 +121,26 @@ export default function FloatingTabBar({
   const dynamicStyles = {
     blurContainer: {
       ...styles.blurContainer,
-      borderWidth: 1.2,
-      borderColor: 'rgba(255, 255, 255, 1)',
+      borderWidth: 1.5,
+      borderColor: theme.dark
+        ? 'rgba(255, 255, 255, 0.15)'
+        : 'rgba(255, 255, 255, 0.4)',
       ...Platform.select({
         ios: {
           backgroundColor: theme.dark
-            ? 'rgba(28, 28, 30, 0.8)'
-            : 'rgba(255, 255, 255, 0.6)',
+            ? 'rgba(28, 28, 30, 0.7)'
+            : 'rgba(255, 255, 255, 0.5)',
         },
         android: {
           backgroundColor: theme.dark
-            ? 'rgba(28, 28, 30, 0.95)'
-            : 'rgba(255, 255, 255, 0.6)',
+            ? 'rgba(28, 28, 30, 0.85)'
+            : 'rgba(255, 255, 255, 0.5)',
         },
         web: {
           backgroundColor: theme.dark
-            ? 'rgba(28, 28, 30, 0.95)'
-            : 'rgba(255, 255, 255, 0.6)',
-          backdropFilter: 'blur(10px)',
+            ? 'rgba(28, 28, 30, 0.85)'
+            : 'rgba(255, 255, 255, 0.5)',
+          backdropFilter: 'blur(20px)',
         },
       }),
     },
@@ -149,9 +150,23 @@ export default function FloatingTabBar({
     indicator: {
       ...styles.indicator,
       backgroundColor: theme.dark
-        ? 'rgba(255, 255, 255, 0.08)' // Subtle white overlay in dark mode
-        : 'rgba(0, 0, 0, 0.04)', // Subtle black overlay in light mode
+        ? 'rgba(255, 255, 255, 0.12)' // Subtle white overlay in dark mode
+        : 'rgba(70, 130, 180, 0.15)', // Subtle primary color overlay in light mode
       width: `${tabWidthPercent}%` as `${number}%`, // Dynamic width based on number of tabs
+      ...Platform.select({
+        web: {
+          boxShadow: theme.dark
+            ? '0 0 15px rgba(255, 255, 255, 0.2)'
+            : '0 0 15px rgba(70, 130, 180, 0.3)',
+        },
+        default: {
+          shadowColor: theme.dark ? '#FFFFFF' : colors.primary,
+          shadowOffset: { width: 0, height: 0 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 4,
+        }
+      }),
     },
   };
 
@@ -161,12 +176,28 @@ export default function FloatingTabBar({
         styles.container,
         {
           width: containerWidth,
-          marginBottom: bottomMargin ?? 20
+          marginBottom: bottomMargin ?? 20,
+          ...Platform.select({
+            web: {
+              boxShadow: theme.dark
+                ? '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(70, 130, 180, 0.2)'
+                : '0 8px 32px rgba(0, 0, 0, 0.15), 0 0 20px rgba(70, 130, 180, 0.3)',
+            },
+            default: {
+              shadowColor: colors.primary,
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.25,
+              shadowRadius: 16,
+              elevation: 12,
+            }
+          })
         }
       ]}>
         <BlurView
-          intensity={80}
+          intensity={Platform.OS === 'android' ? 60 : 90}
+          tint={theme.dark ? 'dark' : 'light'}
           style={[dynamicStyles.blurContainer, { borderRadius }]}
+          experimentalBlurMethod={Platform.OS === 'android' ? 'dimezisBlurView' : 'none'}
         >
           <View style={dynamicStyles.background} />
           <Animated.View style={[dynamicStyles.indicator, indicatorStyle]} />
@@ -176,30 +207,29 @@ export default function FloatingTabBar({
 
               return (
                 <React.Fragment key={index}>
-                <TouchableOpacity
-                  key={index} // Use index as key
-                  style={styles.tab}
-                  onPress={() => handleTabPress(tab.route)}
-                  activeOpacity={0.7}
-                >
-                  <View key={index} style={styles.tabContent}>
-                    <IconSymbol
-                      android_material_icon_name={tab.icon}
-                      ios_icon_name={tab.icon}
-                      size={24}
-                      color={isActive ? colors.primary : colors.text}
-                    />
-                    <Text
-                      style={[
-                        styles.tabLabel,
-                        { color: colors.textSecondary },
-                        isActive && { color: colors.primary, fontWeight: '600' },
-                      ]}
-                    >
-                      {tab.label}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.tab}
+                    onPress={() => handleTabPress(tab.route)}
+                    activeOpacity={0.7}
+                  >
+                    <View style={styles.tabContent}>
+                      <IconSymbol
+                        android_material_icon_name={tab.icon}
+                        ios_icon_name={tab.icon}
+                        size={24}
+                        color={isActive ? colors.primary : colors.text}
+                      />
+                      <Text
+                        style={[
+                          styles.tabLabel,
+                          { color: colors.textSecondary },
+                          isActive && { color: colors.primary, fontWeight: '600' },
+                        ]}
+                      >
+                        {tab.label}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
                 </React.Fragment>
               );
             })}
@@ -222,6 +252,7 @@ const styles = StyleSheet.create({
   container: {
     marginHorizontal: 20,
     alignSelf: 'center',
+    borderRadius: 35,
     // width and marginBottom handled dynamically via props
   },
   blurContainer: {
@@ -239,6 +270,8 @@ const styles = StyleSheet.create({
     bottom: 4,
     borderRadius: 27,
     width: `${(100 / 2) - 1}%`, // Default for 2 tabs, will be overridden by dynamic styles
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
     // Dynamic styling applied in component
   },
   tabsContainer: {
