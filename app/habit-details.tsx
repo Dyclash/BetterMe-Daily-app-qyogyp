@@ -17,6 +17,13 @@ import { useHabits } from '@/hooks/useHabits';
 import { IconSymbol } from '@/components/IconSymbol';
 import { calculateHabitStats } from '@/utils/habitHelpers';
 import * as Haptics from 'expo-haptics';
+import Animated, { 
+  FadeInDown,
+  FadeInUp,
+  useAnimatedStyle,
+  withSpring,
+  useSharedValue
+} from 'react-native-reanimated';
 
 export default function HabitDetailsScreen() {
   const router = useRouter();
@@ -24,15 +31,17 @@ export default function HabitDetailsScreen() {
   const { habits, deleteHabit } = useHabits();
   const [habit, setHabit] = useState<Habit | null>(null);
   const { width: screenWidth } = useWindowDimensions();
+  
+  const deleteButtonScale = useSharedValue(1);
 
   // Responsive sizing
   const isSmallScreen = screenWidth < 375;
   const fontSize = {
-    habitName: isSmallScreen ? 24 : 28,
-    habitDescription: isSmallScreen ? 14 : 16,
-    statValue: isSmallScreen ? 28 : 32,
-    statLabel: isSmallScreen ? 11 : 12,
-    sectionTitle: isSmallScreen ? 18 : 20,
+    habitName: isSmallScreen ? 26 : 30,
+    habitDescription: isSmallScreen ? 15 : 17,
+    statValue: isSmallScreen ? 32 : 36,
+    statLabel: isSmallScreen ? 12 : 13,
+    sectionTitle: isSmallScreen ? 20 : 22,
   };
 
   useEffect(() => {
@@ -43,6 +52,11 @@ export default function HabitDetailsScreen() {
   }, [id, habits]);
 
   const handleDelete = () => {
+    deleteButtonScale.value = withSpring(0.9, { damping: 10 });
+    setTimeout(() => {
+      deleteButtonScale.value = withSpring(1, { damping: 10 });
+    }, 100);
+
     if (Platform.OS === 'web') {
       const confirmed = window.confirm('Are you sure you want to delete this habit?');
       if (confirmed && habit) {
@@ -73,6 +87,12 @@ export default function HabitDetailsScreen() {
     }
   };
 
+  const deleteButtonStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: deleteButtonScale.value }],
+    };
+  });
+
   if (!habit) {
     return (
       <View style={[styles.container, styles.centerContent]}>
@@ -94,23 +114,25 @@ export default function HabitDetailsScreen() {
           <IconSymbol
             ios_icon_name="chevron.left"
             android_material_icon_name="arrow-back"
-            size={24}
+            size={26}
             color={colors.text}
           />
         </Pressable>
         <Text style={styles.headerTitle}>Habit Details</Text>
-        <Pressable 
-          onPress={handleDelete} 
-          style={styles.headerButton}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <IconSymbol
-            ios_icon_name="trash"
-            android_material_icon_name="delete"
-            size={24}
-            color={colors.error}
-          />
-        </Pressable>
+        <Animated.View style={deleteButtonStyle}>
+          <Pressable 
+            onPress={handleDelete} 
+            style={styles.headerButton}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <IconSymbol
+              ios_icon_name="trash"
+              android_material_icon_name="delete"
+              size={26}
+              color={colors.error}
+            />
+          </Pressable>
+        </Animated.View>
       </View>
 
       <ScrollView 
@@ -118,7 +140,24 @@ export default function HabitDetailsScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={[styles.habitHeader, { backgroundColor: habit.color }]}>
+        <Animated.View 
+          entering={FadeInUp.duration(600).springify()}
+          style={[styles.habitHeader, { 
+            backgroundColor: habit.color,
+            ...Platform.select({
+              web: {
+                boxShadow: `0 0 50px ${habit.color}60, 0 12px 40px rgba(0, 0, 0, 0.6)`,
+              },
+              default: {
+                shadowColor: habit.color,
+                shadowOffset: { width: 0, height: 12 },
+                shadowOpacity: 0.7,
+                shadowRadius: 24,
+                elevation: 16,
+              }
+            })
+          }]}
+        >
           <Text style={styles.habitIcon}>{habit.icon}</Text>
           <Text style={[styles.habitName, { fontSize: fontSize.habitName }]}>
             {habit.name}
@@ -128,14 +167,17 @@ export default function HabitDetailsScreen() {
               {habit.description}
             </Text>
           )}
-        </View>
+        </Animated.View>
 
         <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
+          <Animated.View 
+            entering={FadeInDown.delay(100).duration(600).springify()}
+            style={styles.statCard}
+          >
             <IconSymbol
               ios_icon_name="flame.fill"
               android_material_icon_name="local-fire-department"
-              size={32}
+              size={36}
               color={colors.accent}
             />
             <Text style={[styles.statValue, { fontSize: fontSize.statValue }]}>
@@ -144,13 +186,16 @@ export default function HabitDetailsScreen() {
             <Text style={[styles.statLabel, { fontSize: fontSize.statLabel }]}>
               Current Streak
             </Text>
-          </View>
+          </Animated.View>
 
-          <View style={styles.statCard}>
+          <Animated.View 
+            entering={FadeInDown.delay(200).duration(600).springify()}
+            style={styles.statCard}
+          >
             <IconSymbol
               ios_icon_name="chart.bar.fill"
               android_material_icon_name="bar-chart"
-              size={32}
+              size={36}
               color={colors.primary}
             />
             <Text style={[styles.statValue, { fontSize: fontSize.statValue }]}>
@@ -159,15 +204,18 @@ export default function HabitDetailsScreen() {
             <Text style={[styles.statLabel, { fontSize: fontSize.statLabel }]}>
               Longest Streak
             </Text>
-          </View>
+          </Animated.View>
         </View>
 
         <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
+          <Animated.View 
+            entering={FadeInDown.delay(300).duration(600).springify()}
+            style={styles.statCard}
+          >
             <IconSymbol
               ios_icon_name="checkmark.circle.fill"
               android_material_icon_name="check-circle"
-              size={32}
+              size={36}
               color={colors.success}
             />
             <Text style={[styles.statValue, { fontSize: fontSize.statValue }]}>
@@ -176,13 +224,16 @@ export default function HabitDetailsScreen() {
             <Text style={[styles.statLabel, { fontSize: fontSize.statLabel }]}>
               Total Completions
             </Text>
-          </View>
+          </Animated.View>
 
-          <View style={styles.statCard}>
+          <Animated.View 
+            entering={FadeInDown.delay(400).duration(600).springify()}
+            style={styles.statCard}
+          >
             <IconSymbol
               ios_icon_name="percent"
               android_material_icon_name="percent"
-              size={32}
+              size={36}
               color={colors.secondary}
             />
             <Text style={[styles.statValue, { fontSize: fontSize.statValue }]}>
@@ -191,10 +242,13 @@ export default function HabitDetailsScreen() {
             <Text style={[styles.statLabel, { fontSize: fontSize.statLabel }]}>
               Completion Rate
             </Text>
-          </View>
+          </Animated.View>
         </View>
 
-        <View style={styles.infoCard}>
+        <Animated.View 
+          entering={FadeInDown.delay(500).duration(600).springify()}
+          style={styles.infoCard}
+        >
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Frequency</Text>
             <Text style={styles.infoValue}>
@@ -205,15 +259,18 @@ export default function HabitDetailsScreen() {
             <Text style={styles.infoLabel}>Target</Text>
             <Text style={styles.infoValue}>{habit.targetCount}x per {habit.frequency}</Text>
           </View>
-          <View style={styles.infoRow}>
+          <View style={[styles.infoRow, { borderBottomWidth: 0 }]}>
             <Text style={styles.infoLabel}>Created</Text>
             <Text style={styles.infoValue}>
               {new Date(habit.createdAt).toLocaleDateString()}
             </Text>
           </View>
-        </View>
+        </Animated.View>
 
-        <View style={styles.recentActivity}>
+        <Animated.View 
+          entering={FadeInDown.delay(600).duration(600).springify()}
+          style={styles.recentActivity}
+        >
           <Text style={[styles.sectionTitle, { fontSize: fontSize.sectionTitle }]}>
             Recent Activity
           </Text>
@@ -232,7 +289,7 @@ export default function HabitDetailsScreen() {
                       <Text style={styles.activityDate}>
                         {new Date(completion.date).toLocaleDateString()}
                       </Text>
-                      <View style={styles.activityBadge}>
+                      <View style={[styles.activityBadge, { backgroundColor: habit.color }]}>
                         <Text style={styles.activityCount}>{completion.count}</Text>
                       </View>
                     </View>
@@ -240,7 +297,7 @@ export default function HabitDetailsScreen() {
                 ))}
             </View>
           )}
-        </View>
+        </Animated.View>
       </ScrollView>
     </View>
   );
@@ -260,11 +317,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 18,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
-    minHeight: 60,
+    minHeight: 64,
+    backgroundColor: colors.backgroundSecondary,
   },
   headerButton: {
     padding: 8,
@@ -274,157 +332,176 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: '700',
     color: colors.text,
+    letterSpacing: 0.5,
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 120,
+    paddingBottom: 140,
   },
   habitHeader: {
-    padding: 32,
+    padding: 40,
     alignItems: 'center',
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
   },
   habitIcon: {
-    fontSize: 64,
-    marginBottom: 16,
+    fontSize: 72,
+    marginBottom: 20,
   },
   habitName: {
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 8,
+    fontWeight: '900',
+    color: colors.background,
+    marginBottom: 10,
     textAlign: 'center',
+    letterSpacing: 0.8,
   },
   habitDescription: {
-    color: '#FFFFFF',
+    color: colors.background,
     opacity: 0.9,
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: 24,
+    letterSpacing: 0.3,
   },
   statsContainer: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
-    gap: 12,
-    marginTop: 16,
+    paddingHorizontal: 20,
+    gap: 14,
+    marginTop: 20,
   },
   statCard: {
     flex: 1,
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: 20,
+    backgroundColor: colors.backgroundSecondary,
+    borderRadius: 20,
+    padding: 24,
     alignItems: 'center',
-    minHeight: 120,
+    minHeight: 140,
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
     ...Platform.select({
       web: {
-        boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
+        boxShadow: `0 0 30px ${colors.neonBlue}20, 0 8px 24px rgba(0, 0, 0, 0.4)`,
       },
       default: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 8,
-        elevation: 2,
+        shadowColor: colors.neonBlue,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 12,
+        elevation: 8,
       }
     }),
   },
   statValue: {
-    fontWeight: '700',
+    fontWeight: '900',
     color: colors.text,
-    marginTop: 8,
+    marginTop: 12,
+    letterSpacing: 0.5,
   },
   statLabel: {
     color: colors.textSecondary,
-    marginTop: 4,
+    marginTop: 6,
     textAlign: 'center',
+    letterSpacing: 0.3,
   },
   infoCard: {
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: 20,
-    marginHorizontal: 16,
-    marginTop: 16,
+    backgroundColor: colors.backgroundSecondary,
+    borderRadius: 20,
+    padding: 24,
+    marginHorizontal: 20,
+    marginTop: 20,
+    borderWidth: 1,
+    borderColor: colors.border,
     ...Platform.select({
       web: {
-        boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
+        boxShadow: `0 0 30px ${colors.neonBlue}20, 0 8px 24px rgba(0, 0, 0, 0.4)`,
       },
       default: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 8,
-        elevation: 2,
+        shadowColor: colors.neonBlue,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 12,
+        elevation: 8,
       }
     }),
   },
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 12,
+    paddingVertical: 14,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
-    minHeight: 48,
+    minHeight: 52,
     alignItems: 'center',
   },
   infoLabel: {
-    fontSize: 16,
+    fontSize: 17,
     color: colors.textSecondary,
+    letterSpacing: 0.3,
   },
   infoValue: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  recentActivity: {
-    marginTop: 24,
-    paddingHorizontal: 16,
-  },
-  sectionTitle: {
+    fontSize: 17,
     fontWeight: '700',
     color: colors.text,
-    marginBottom: 16,
+    letterSpacing: 0.3,
+  },
+  recentActivity: {
+    marginTop: 28,
+    paddingHorizontal: 20,
+  },
+  sectionTitle: {
+    fontWeight: '900',
+    color: colors.text,
+    marginBottom: 18,
+    letterSpacing: 0.5,
   },
   emptyContainer: {
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: 32,
+    backgroundColor: colors.backgroundSecondary,
+    borderRadius: 20,
+    padding: 36,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
     ...Platform.select({
       web: {
-        boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
+        boxShadow: `0 0 30px ${colors.neonBlue}20, 0 8px 24px rgba(0, 0, 0, 0.4)`,
       },
       default: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 8,
-        elevation: 2,
+        shadowColor: colors.neonBlue,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 12,
+        elevation: 8,
       }
     }),
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: 17,
     color: colors.textSecondary,
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: 24,
+    letterSpacing: 0.3,
   },
   activityList: {
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: 16,
+    backgroundColor: colors.backgroundSecondary,
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: colors.border,
     ...Platform.select({
       web: {
-        boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
+        boxShadow: `0 0 30px ${colors.neonBlue}20, 0 8px 24px rgba(0, 0, 0, 0.4)`,
       },
       default: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 8,
-        elevation: 2,
+        shadowColor: colors.neonBlue,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 12,
+        elevation: 8,
       }
     }),
   },
@@ -432,32 +509,39 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 14,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
-    minHeight: 48,
+    minHeight: 52,
   },
   activityDate: {
-    fontSize: 16,
+    fontSize: 17,
     color: colors.text,
+    letterSpacing: 0.3,
   },
   activityBadge: {
-    backgroundColor: colors.primary,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    minWidth: 44,
-    minHeight: 32,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    minWidth: 48,
+    minHeight: 36,
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: colors.neonBlue,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 10,
+    elevation: 6,
   },
   activityCount: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '800',
+    color: colors.background,
+    letterSpacing: 0.5,
   },
   errorText: {
-    fontSize: 18,
+    fontSize: 20,
     color: colors.textSecondary,
+    letterSpacing: 0.3,
   },
 });

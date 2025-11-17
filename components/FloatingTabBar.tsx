@@ -53,9 +53,9 @@ export default function FloatingTabBar({
   const isSmallScreen = screenWidth < 375;
   const defaultContainerWidth = isSmallScreen ? screenWidth * 0.85 : screenWidth / 2.5;
   const finalContainerWidth = containerWidth || defaultContainerWidth;
-  const tabHeight = isSmallScreen ? 56 : 60;
-  const iconSize = isSmallScreen ? 22 : 24;
-  const labelFontSize = isSmallScreen ? 8 : 9;
+  const tabHeight = isSmallScreen ? 60 : 64;
+  const iconSize = isSmallScreen ? 24 : 26;
+  const labelFontSize = isSmallScreen ? 9 : 10;
 
   // Improved active tab detection with better path matching
   const activeTabIndex = React.useMemo(() => {
@@ -118,26 +118,18 @@ export default function FloatingTabBar({
   const dynamicStyles = {
     blurContainer: {
       ...styles.blurContainer,
-      borderWidth: 1.5,
-      borderColor: theme.dark
-        ? 'rgba(255, 255, 255, 0.15)'
-        : 'rgba(255, 255, 255, 0.4)',
+      borderWidth: 2,
+      borderColor: colors.border,
       ...Platform.select({
         ios: {
-          backgroundColor: theme.dark
-            ? 'rgba(28, 28, 30, 0.7)'
-            : 'rgba(255, 255, 255, 0.5)',
+          backgroundColor: 'rgba(26, 26, 26, 0.8)',
         },
         android: {
-          backgroundColor: theme.dark
-            ? 'rgba(28, 28, 30, 0.85)'
-            : 'rgba(255, 255, 255, 0.5)',
+          backgroundColor: 'rgba(26, 26, 26, 0.9)',
         },
         web: {
-          backgroundColor: theme.dark
-            ? 'rgba(28, 28, 30, 0.85)'
-            : 'rgba(255, 255, 255, 0.5)',
-          backdropFilter: 'blur(20px)',
+          backgroundColor: 'rgba(26, 26, 26, 0.9)',
+          backdropFilter: 'blur(30px)',
         },
       }),
     },
@@ -146,22 +138,18 @@ export default function FloatingTabBar({
     },
     indicator: {
       ...styles.indicator,
-      backgroundColor: theme.dark
-        ? 'rgba(255, 255, 255, 0.12)'
-        : 'rgba(70, 130, 180, 0.15)',
+      backgroundColor: colors.backgroundTertiary,
       width: `${tabWidthPercent}%` as `${number}%`,
       ...Platform.select({
         web: {
-          boxShadow: theme.dark
-            ? '0 0 15px rgba(255, 255, 255, 0.2)'
-            : '0 0 15px rgba(70, 130, 180, 0.3)',
+          boxShadow: `0 0 25px ${colors.neonBlue}50`,
         },
         default: {
-          shadowColor: theme.dark ? '#FFFFFF' : colors.primary,
+          shadowColor: colors.neonBlue,
           shadowOffset: { width: 0, height: 0 },
-          shadowOpacity: 0.3,
-          shadowRadius: 8,
-          elevation: 4,
+          shadowOpacity: 0.6,
+          shadowRadius: 12,
+          elevation: 8,
         }
       }),
     },
@@ -176,23 +164,21 @@ export default function FloatingTabBar({
           marginBottom: bottomMargin ?? (isSmallScreen ? 16 : 20),
           ...Platform.select({
             web: {
-              boxShadow: theme.dark
-                ? '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(70, 130, 180, 0.2)'
-                : '0 8px 32px rgba(0, 0, 0, 0.15), 0 0 20px rgba(70, 130, 180, 0.3)',
+              boxShadow: `0 0 50px ${colors.neonBlue}40, 0 12px 40px rgba(0, 0, 0, 0.8)`,
             },
             default: {
-              shadowColor: colors.primary,
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.25,
-              shadowRadius: 16,
-              elevation: 12,
+              shadowColor: colors.neonBlue,
+              shadowOffset: { width: 0, height: 12 },
+              shadowOpacity: 0.6,
+              shadowRadius: 24,
+              elevation: 20,
             }
           })
         }
       ]}>
         <BlurView
-          intensity={Platform.OS === 'android' ? 60 : 90}
-          tint={theme.dark ? 'dark' : 'light'}
+          intensity={Platform.OS === 'android' ? 40 : 60}
+          tint="dark"
           style={[dynamicStyles.blurContainer, { borderRadius }]}
           experimentalBlurMethod={Platform.OS === 'android' ? 'dimezisBlurView' : 'none'}
         >
@@ -215,7 +201,7 @@ export default function FloatingTabBar({
                         android_material_icon_name={tab.icon}
                         ios_icon_name={tab.icon}
                         size={iconSize}
-                        color={isActive ? colors.primary : colors.text}
+                        color={isActive ? colors.primary : colors.textSecondary}
                       />
                       <Text
                         style={[
@@ -224,7 +210,7 @@ export default function FloatingTabBar({
                             color: colors.textSecondary,
                             fontSize: labelFontSize,
                           },
-                          isActive && { color: colors.primary, fontWeight: '600' },
+                          isActive && { color: colors.primary, fontWeight: '700' },
                         ]}
                       >
                         {tab.label}
@@ -268,7 +254,7 @@ const styles = StyleSheet.create({
     bottom: 4,
     borderRadius: 27,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderColor: colors.border,
   },
   tabsContainer: {
     flexDirection: 'row',
@@ -285,10 +271,11 @@ const styles = StyleSheet.create({
   tabContent: {
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 2,
+    gap: 3,
   },
   tabLabel: {
-    fontWeight: '500',
+    fontWeight: '600',
     marginTop: 2,
+    letterSpacing: 0.2,
   },
 });

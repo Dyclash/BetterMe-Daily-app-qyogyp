@@ -1,18 +1,41 @@
 
 import { StyleSheet, ViewStyle, TextStyle, Platform } from 'react-native';
 
+// Ultra-modern dark luxury color palette
 export const colors = {
-  background: '#F5F5DC',
-  text: '#333333',
-  textSecondary: '#777777',
-  primary: '#4682B4',
-  secondary: '#6A5ACD',
-  accent: '#E9967A',
-  card: '#FFFFFF',
-  highlight: '#FFD700',
-  success: '#34C759',
-  error: '#FF3B30',
-  border: '#E0E0E0',
+  // Primary colors - Jet Black, Neon Blue, Cyan
+  background: '#0A0A0A',
+  backgroundSecondary: '#1A1A1A',
+  backgroundTertiary: '#2A2A2A',
+  
+  text: '#FFFFFF',
+  textSecondary: '#A0A0A0',
+  textTertiary: '#707070',
+  
+  primary: '#00D9FF',
+  secondary: '#00FFF0',
+  accent: '#00D9FF',
+  
+  card: '#1A1A1A',
+  cardBorder: '#2A2A2A',
+  
+  highlight: '#00FFF0',
+  success: '#00FF88',
+  error: '#FF3366',
+  warning: '#FFB800',
+  
+  border: '#2A2A2A',
+  
+  // Glassmorphism overlays
+  glassLight: 'rgba(255, 255, 255, 0.05)',
+  glassMedium: 'rgba(255, 255, 255, 0.08)',
+  glassDark: 'rgba(0, 0, 0, 0.3)',
+  
+  // Neon glow colors
+  neonBlue: '#00D9FF',
+  neonCyan: '#00FFF0',
+  neonPurple: '#B026FF',
+  neonPink: '#FF006E',
 };
 
 export const buttonStyles = StyleSheet.create({
@@ -78,20 +101,20 @@ export const commonStyles = StyleSheet.create({
     backgroundColor: colors.card,
     borderColor: colors.border,
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 16,
     marginVertical: 8,
     width: '100%',
     ...Platform.select({
       web: {
-        boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)',
+        boxShadow: `0 0 30px ${colors.neonBlue}20, 0 8px 32px rgba(0, 0, 0, 0.4)`,
       },
       default: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 3,
+        shadowColor: colors.neonBlue,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 12,
+        elevation: 8,
       }
     }),
   },
@@ -100,10 +123,10 @@ export const commonStyles = StyleSheet.create({
     height: 60,
     tintColor: colors.primary,
   },
-  // Glassmorphism card style
+  // Ultra-modern glassmorphism card style
   glassCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: 'rgba(26, 26, 26, 0.6)',
+    borderColor: 'rgba(0, 217, 255, 0.2)',
     borderWidth: 1,
     borderRadius: 20,
     padding: 16,
@@ -112,15 +135,15 @@ export const commonStyles = StyleSheet.create({
     overflow: 'hidden',
     ...Platform.select({
       web: {
-        backdropFilter: 'blur(10px)',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 0 20px rgba(70, 130, 180, 0.2)',
+        backdropFilter: 'blur(20px)',
+        boxShadow: `0 0 40px ${colors.neonBlue}30, 0 8px 32px rgba(0, 0, 0, 0.5)`,
       },
       default: {
-        shadowColor: colors.primary,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 12,
-        elevation: 8,
+        shadowColor: colors.neonBlue,
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.4,
+        shadowRadius: 16,
+        elevation: 12,
       }
     }),
   },

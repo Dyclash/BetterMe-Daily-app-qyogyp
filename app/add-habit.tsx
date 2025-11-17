@@ -19,27 +19,32 @@ import { Habit, HabitFrequency } from '@/types/habit';
 import { useHabits } from '@/hooks/useHabits';
 import { IconSymbol } from '@/components/IconSymbol';
 import * as Haptics from 'expo-haptics';
+import Animated, { 
+  useAnimatedStyle, 
+  withSpring,
+  useSharedValue
+} from 'react-native-reanimated';
 
 const HABIT_ICONS = ['🎯', '📚', '💪', '🧘', '💧', '🥗', '🏃', '😴', '🎨', '🎵', '✍️', '🧠'];
 const HABIT_COLORS = [
   colors.primary,
   colors.secondary,
-  colors.accent,
-  '#FF6B6B',
-  '#4ECDC4',
-  '#45B7D1',
-  '#96CEB4',
-  '#FFEAA7',
-  '#DFE6E9',
-  '#A29BFE',
-  '#FD79A8',
-  '#FDCB6E',
+  '#00FF88',
+  '#FF3366',
+  '#FFB800',
+  '#B026FF',
+  '#FF006E',
+  '#00D9FF',
+  '#00FFF0',
+  '#7B2CBF',
+  '#06FFA5',
+  '#FF0080',
 ];
 
 export default function AddHabitScreen() {
   const router = useRouter();
   const { addHabit } = useHabits();
-  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+  const { width: screenWidth } = useWindowDimensions();
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -48,15 +53,22 @@ export default function AddHabitScreen() {
   const [selectedIcon, setSelectedIcon] = useState(HABIT_ICONS[0]);
   const [selectedColor, setSelectedColor] = useState(HABIT_COLORS[0]);
 
+  const saveButtonScale = useSharedValue(1);
+
   // Responsive sizing
   const isSmallScreen = screenWidth < 375;
-  const iconButtonSize = isSmallScreen ? 52 : 56;
-  const colorButtonSize = isSmallScreen ? 44 : 48;
+  const iconButtonSize = isSmallScreen ? 56 : 60;
+  const colorButtonSize = isSmallScreen ? 48 : 52;
 
   const handleSave = async () => {
     if (!name.trim()) {
       return;
     }
+
+    saveButtonScale.value = withSpring(0.9, { damping: 10 });
+    setTimeout(() => {
+      saveButtonScale.value = withSpring(1, { damping: 10 });
+    }, 100);
 
     const newHabit: Habit = {
       id: Date.now().toString(),
@@ -88,6 +100,12 @@ export default function AddHabitScreen() {
     Keyboard.dismiss();
   };
 
+  const saveButtonStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: saveButtonScale.value }],
+    };
+  });
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -105,13 +123,15 @@ export default function AddHabitScreen() {
               <Text style={styles.headerButtonText}>Cancel</Text>
             </Pressable>
             <Text style={styles.headerTitle}>New Habit</Text>
-            <Pressable 
-              onPress={handleSave} 
-              style={styles.headerButton}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <Text style={[styles.headerButtonText, styles.saveButton]}>Save</Text>
-            </Pressable>
+            <Animated.View style={saveButtonStyle}>
+              <Pressable 
+                onPress={handleSave} 
+                style={styles.headerButton}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Text style={[styles.headerButtonText, styles.saveButton]}>Save</Text>
+              </Pressable>
+            </Animated.View>
           </View>
 
           <ScrollView 
@@ -125,7 +145,7 @@ export default function AddHabitScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="e.g., Morning Exercise"
-                placeholderTextColor={colors.textSecondary}
+                placeholderTextColor={colors.textTertiary}
                 value={name}
                 onChangeText={setName}
                 returnKeyType="next"
@@ -138,7 +158,7 @@ export default function AddHabitScreen() {
               <TextInput
                 style={[styles.input, styles.textArea]}
                 placeholder="Add a description..."
-                placeholderTextColor={colors.textSecondary}
+                placeholderTextColor={colors.textTertiary}
                 value={description}
                 onChangeText={setDescription}
                 multiline
@@ -185,7 +205,7 @@ export default function AddHabitScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="1"
-                placeholderTextColor={colors.textSecondary}
+                placeholderTextColor={colors.textTertiary}
                 value={targetCount}
                 onChangeText={setTargetCount}
                 keyboardType="number-pad"
@@ -249,8 +269,8 @@ export default function AddHabitScreen() {
                         <IconSymbol
                           ios_icon_name="checkmark"
                           android_material_icon_name="check"
-                          size={20}
-                          color="#FFFFFF"
+                          size={24}
+                          color={colors.background}
                         />
                       )}
                     </Pressable>
@@ -278,11 +298,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 18,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
-    minHeight: 60,
+    minHeight: 64,
+    backgroundColor: colors.backgroundSecondary,
   },
   headerButton: {
     padding: 8,
@@ -292,46 +313,49 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerButtonText: {
-    fontSize: 16,
+    fontSize: 17,
     color: colors.primary,
+    fontWeight: '600',
   },
   saveButton: {
-    fontWeight: '600',
+    color: colors.secondary,
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: '700',
     color: colors.text,
+    letterSpacing: 0.5,
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
-    paddingBottom: 120,
+    padding: 20,
+    paddingBottom: 140,
   },
   section: {
-    marginBottom: 24,
+    marginBottom: 28,
   },
   label: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 17,
+    fontWeight: '700',
     color: colors.text,
-    marginBottom: 8,
+    marginBottom: 12,
+    letterSpacing: 0.3,
   },
   input: {
-    backgroundColor: colors.card,
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: colors.backgroundSecondary,
+    borderRadius: 16,
+    padding: 18,
     fontSize: 16,
     color: colors.text,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: colors.border,
-    minHeight: 52,
+    minHeight: 56,
   },
   textArea: {
-    minHeight: 100,
-    paddingTop: 16,
+    minHeight: 110,
+    paddingTop: 18,
   },
   frequencyContainer: {
     flexDirection: 'row',
@@ -339,27 +363,33 @@ const styles = StyleSheet.create({
   },
   frequencyButton: {
     flex: 1,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    backgroundColor: colors.card,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    borderRadius: 16,
+    backgroundColor: colors.backgroundSecondary,
     borderWidth: 2,
     borderColor: colors.border,
     alignItems: 'center',
-    minHeight: 48,
+    minHeight: 52,
     justifyContent: 'center',
   },
   frequencyButtonActive: {
     backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    borderColor: colors.secondary,
+    shadowColor: colors.neonBlue,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 12,
+    elevation: 8,
   },
   frequencyButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text,
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.textSecondary,
+    letterSpacing: 0.3,
   },
   frequencyButtonTextActive: {
-    color: '#FFFFFF',
+    color: colors.background,
   },
   iconGrid: {
     flexDirection: 'row',
@@ -367,8 +397,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   iconButton: {
-    borderRadius: 12,
-    backgroundColor: colors.card,
+    borderRadius: 16,
+    backgroundColor: colors.backgroundSecondary,
     borderWidth: 2,
     borderColor: colors.border,
     justifyContent: 'center',
@@ -376,7 +406,12 @@ const styles = StyleSheet.create({
   },
   iconButtonActive: {
     borderColor: colors.primary,
-    backgroundColor: colors.background,
+    backgroundColor: colors.backgroundTertiary,
+    shadowColor: colors.neonBlue,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 12,
+    elevation: 8,
   },
   iconText: {
     // fontSize set dynamically
@@ -384,7 +419,7 @@ const styles = StyleSheet.create({
   colorGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: 14,
   },
   colorButton: {
     justifyContent: 'center',
@@ -394,5 +429,10 @@ const styles = StyleSheet.create({
   },
   colorButtonActive: {
     borderColor: colors.text,
+    shadowColor: colors.neonBlue,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 16,
+    elevation: 12,
   },
 });

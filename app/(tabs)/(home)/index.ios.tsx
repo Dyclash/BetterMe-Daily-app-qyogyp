@@ -7,28 +7,62 @@ import { useHabits } from '@/hooks/useHabits';
 import { HabitCard } from '@/components/HabitCard';
 import { EmptyState } from '@/components/EmptyState';
 import { IconSymbol } from '@/components/IconSymbol';
+import Animated, { 
+  useAnimatedStyle, 
+  withSpring,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+  Easing
+} from 'react-native-reanimated';
+import { useEffect } from 'react';
 
 export default function HomeScreen() {
   const router = useRouter();
   const { habits, loading, toggleHabitCompletion } = useHabits();
   const { width: screenWidth } = useWindowDimensions();
+  
+  const fabScale = useSharedValue(1);
+  const fabRotation = useSharedValue(0);
 
   // Responsive sizing
   const isSmallScreen = screenWidth < 375;
-  const headerFontSize = {
-    title: isSmallScreen ? 28 : 32,
-    subtitle: isSmallScreen ? 14 : 16,
-  };
-  const fabSize = isSmallScreen ? 52 : 56;
+  const fabSize = isSmallScreen ? 60 : 68;
   const fabBottom = isSmallScreen ? 90 : 100;
 
+  useEffect(() => {
+    // Subtle pulsing animation for FAB
+    fabScale.value = withRepeat(
+      withSequence(
+        withTiming(1.05, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
+        withTiming(1, { duration: 1500, easing: Easing.inOut(Easing.ease) })
+      ),
+      -1,
+      false
+    );
+  }, []);
+
   const handleAddHabit = () => {
+    fabRotation.value = withSequence(
+      withSpring(90, { damping: 10 }),
+      withSpring(0, { damping: 10 })
+    );
     router.push('/add-habit');
   };
 
   const handleHabitPress = (habitId: string) => {
     router.push(`/habit-details?id=${habitId}`);
   };
+
+  const fabAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { scale: fabScale.value },
+        { rotate: `${fabRotation.value}deg` }
+      ],
+    };
+  });
 
   if (loading) {
     return (
@@ -37,6 +71,13 @@ export default function HomeScreen() {
           options={{
             title: 'My Habits',
             headerLargeTitle: true,
+            headerStyle: {
+              backgroundColor: colors.background,
+            },
+            headerTintColor: colors.text,
+            headerLargeTitleStyle: {
+              color: colors.text,
+            },
           }}
         />
         <View style={[styles.container, styles.centerContent]}>
@@ -52,6 +93,13 @@ export default function HomeScreen() {
         options={{
           title: 'My Habits',
           headerLargeTitle: true,
+          headerStyle: {
+            backgroundColor: colors.background,
+          },
+          headerTintColor: colors.text,
+          headerLargeTitleStyle: {
+            color: colors.text,
+          },
         }}
       />
       <View style={styles.container}>
@@ -81,26 +129,29 @@ export default function HomeScreen() {
           )}
         </ScrollView>
 
-        <Pressable 
-          style={[
-            styles.fab, 
-            { 
-              width: fabSize, 
-              height: fabSize, 
-              borderRadius: fabSize / 2,
-              bottom: fabBottom,
-            }
-          ]} 
-          onPress={handleAddHabit}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <IconSymbol
-            ios_icon_name="plus"
-            android_material_icon_name="add"
-            size={28}
-            color="#FFFFFF"
-          />
-        </Pressable>
+        <Animated.View style={[
+          styles.fabContainer,
+          fabAnimatedStyle,
+          { 
+            width: fabSize, 
+            height: fabSize, 
+            borderRadius: fabSize / 2,
+            bottom: fabBottom,
+          }
+        ]}>
+          <Pressable 
+            style={styles.fab}
+            onPress={handleAddHabit}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <IconSymbol
+              ios_icon_name="plus"
+              android_material_icon_name="add"
+              size={32}
+              color={colors.background}
+            />
+          </Pressable>
+        </Animated.View>
       </View>
     </React.Fragment>
   );
@@ -119,23 +170,30 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     paddingTop: 16,
-    paddingBottom: 140,
+    paddingBottom: 160,
   },
   habitsList: {
     flex: 1,
   },
-  fab: {
+  fabContainer: {
     position: 'absolute',
-    right: 20,
+    right: 24,
+    shadowColor: colors.neonBlue,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.8,
+    shadowRadius: 20,
+    elevation: 16,
+  },
+  fab: {
+    width: '100%',
+    height: '100%',
     backgroundColor: colors.primary,
+    borderRadius: 999,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    borderWidth: 2,
+    borderColor: colors.secondary,
   },
 });

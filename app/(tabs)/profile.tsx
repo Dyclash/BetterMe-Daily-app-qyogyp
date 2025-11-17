@@ -5,6 +5,7 @@ import { colors } from '@/styles/commonStyles';
 import { useHabits } from '@/hooks/useHabits';
 import { IconSymbol } from '@/components/IconSymbol';
 import { calculateHabitStats } from '@/utils/habitHelpers';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 export default function ProfileScreen() {
   const { habits } = useHabits();
@@ -36,61 +37,79 @@ export default function ProfileScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
+        <Animated.View 
+          entering={FadeInDown.duration(600).springify()}
+          style={styles.header}
+        >
           <View style={styles.avatarContainer}>
             <Text style={styles.avatarEmoji}>🎯</Text>
           </View>
           <Text style={styles.userName}>Habit Tracker</Text>
           <Text style={styles.userSubtitle}>Building better habits</Text>
-        </View>
+        </Animated.View>
 
         <View style={styles.statsGrid}>
-          <View style={styles.statCard}>
+          <Animated.View 
+            entering={FadeInDown.delay(100).duration(600).springify()}
+            style={styles.statCard}
+          >
             <IconSymbol
               ios_icon_name="list.bullet"
               android_material_icon_name="list"
-              size={28}
+              size={32}
               color={colors.primary}
             />
             <Text style={styles.statValue}>{totalHabits}</Text>
             <Text style={styles.statLabel}>Total Habits</Text>
-          </View>
+          </Animated.View>
 
-          <View style={styles.statCard}>
+          <Animated.View 
+            entering={FadeInDown.delay(200).duration(600).springify()}
+            style={styles.statCard}
+          >
             <IconSymbol
               ios_icon_name="checkmark.circle.fill"
               android_material_icon_name="check-circle"
-              size={28}
+              size={32}
               color={colors.success}
             />
             <Text style={styles.statValue}>{totalCompletions}</Text>
             <Text style={styles.statLabel}>Completions</Text>
-          </View>
+          </Animated.View>
 
-          <View style={styles.statCard}>
+          <Animated.View 
+            entering={FadeInDown.delay(300).duration(600).springify()}
+            style={styles.statCard}
+          >
             <IconSymbol
               ios_icon_name="flame.fill"
               android_material_icon_name="local-fire-department"
-              size={28}
+              size={32}
               color={colors.accent}
             />
             <Text style={styles.statValue}>{averageStreak}</Text>
             <Text style={styles.statLabel}>Avg Streak</Text>
-          </View>
+          </Animated.View>
 
-          <View style={styles.statCard}>
+          <Animated.View 
+            entering={FadeInDown.delay(400).duration(600).springify()}
+            style={styles.statCard}
+          >
             <IconSymbol
               ios_icon_name="trophy.fill"
               android_material_icon_name="emoji-events"
-              size={28}
-              color={colors.highlight}
+              size={32}
+              color={colors.warning}
             />
             <Text style={styles.statValue}>{bestStreak}</Text>
             <Text style={styles.statLabel}>Best Streak</Text>
-          </View>
+          </Animated.View>
         </View>
 
-        <View style={styles.section}>
+        <Animated.View 
+          entering={FadeInDown.delay(500).duration(600).springify()}
+          style={styles.section}
+        >
           <Text style={styles.sectionTitle}>About</Text>
           <View style={styles.card}>
             <Text style={styles.aboutText}>
@@ -100,9 +119,12 @@ export default function ProfileScreen() {
               Set goals, track your streaks, and watch yourself grow one day at a time.
             </Text>
           </View>
-        </View>
+        </Animated.View>
 
-        <View style={styles.section}>
+        <Animated.View 
+          entering={FadeInDown.delay(600).duration(600).springify()}
+          style={styles.section}
+        >
           <Text style={styles.sectionTitle}>Tips for Success</Text>
           <View style={styles.card}>
             <View style={styles.tipItem}>
@@ -122,7 +144,7 @@ export default function ProfileScreen() {
               <Text style={styles.tipText}>Don&apos;t break the chain!</Text>
             </View>
           </View>
-        </View>
+        </Animated.View>
       </ScrollView>
     </View>
   );
@@ -137,101 +159,137 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingTop: Platform.OS === 'android' ? 48 : 16,
-    paddingHorizontal: 16,
-    paddingBottom: 100,
+    paddingTop: Platform.OS === 'android' ? 56 : 24,
+    paddingHorizontal: 20,
+    paddingBottom: 120,
   },
   header: {
     alignItems: 'center',
-    paddingVertical: 32,
+    paddingVertical: 40,
   },
   avatarContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: colors.card,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: colors.backgroundSecondary,
+    borderWidth: 3,
+    borderColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
-    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
-    elevation: 4,
+    marginBottom: 20,
+    shadowColor: colors.neonBlue,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 24,
+    elevation: 12,
   },
   avatarEmoji: {
-    fontSize: 48,
+    fontSize: 56,
   },
   userName: {
-    fontSize: 28,
-    fontWeight: '700',
+    fontSize: 32,
+    fontWeight: '900',
     color: colors.text,
-    marginBottom: 4,
+    marginBottom: 6,
+    letterSpacing: 0.8,
   },
   userSubtitle: {
-    fontSize: 16,
+    fontSize: 17,
     color: colors.textSecondary,
+    letterSpacing: 0.3,
   },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
-    marginBottom: 24,
+    gap: 14,
+    marginBottom: 28,
   },
   statCard: {
     flex: 1,
     minWidth: '45%',
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: 20,
+    backgroundColor: colors.backgroundSecondary,
+    borderRadius: 20,
+    padding: 24,
     alignItems: 'center',
-    boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...Platform.select({
+      web: {
+        boxShadow: `0 0 30px ${colors.neonBlue}20, 0 8px 24px rgba(0, 0, 0, 0.4)`,
+      },
+      default: {
+        shadowColor: colors.neonBlue,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 12,
+        elevation: 8,
+      }
+    }),
   },
   statValue: {
-    fontSize: 32,
-    fontWeight: '700',
+    fontSize: 36,
+    fontWeight: '900',
     color: colors.text,
-    marginTop: 8,
+    marginTop: 12,
+    letterSpacing: 0.5,
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: 13,
     color: colors.textSecondary,
-    marginTop: 4,
+    marginTop: 6,
     textAlign: 'center',
+    letterSpacing: 0.3,
   },
   section: {
-    marginBottom: 24,
+    marginBottom: 28,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: 22,
+    fontWeight: '900',
     color: colors.text,
-    marginBottom: 12,
+    marginBottom: 16,
+    letterSpacing: 0.5,
   },
   card: {
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: 20,
-    boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
-    elevation: 2,
+    backgroundColor: colors.backgroundSecondary,
+    borderRadius: 20,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...Platform.select({
+      web: {
+        boxShadow: `0 0 30px ${colors.neonBlue}20, 0 8px 24px rgba(0, 0, 0, 0.4)`,
+      },
+      default: {
+        shadowColor: colors.neonBlue,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 12,
+        elevation: 8,
+      }
+    }),
   },
   aboutText: {
-    fontSize: 16,
+    fontSize: 17,
     color: colors.text,
-    lineHeight: 24,
-    marginBottom: 12,
+    lineHeight: 26,
+    marginBottom: 14,
+    letterSpacing: 0.3,
   },
   tipItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 18,
   },
   tipEmoji: {
-    fontSize: 24,
-    marginRight: 12,
+    fontSize: 28,
+    marginRight: 14,
   },
   tipText: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 17,
     color: colors.text,
-    lineHeight: 22,
+    lineHeight: 24,
+    letterSpacing: 0.3,
   },
 });
