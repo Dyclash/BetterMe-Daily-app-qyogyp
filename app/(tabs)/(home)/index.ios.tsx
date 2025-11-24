@@ -125,7 +125,7 @@ export default function HomeScreen() {
           ) : (
             <View style={styles.habitsList}>
               {habits.map((habit, index) => (
-                <React.Fragment key={index}>
+                <React.Fragment key={habit.id}>
                   <HabitCard
                     habit={habit}
                     onPress={() => handleHabitPress(habit.id)}
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     paddingBottom: 160,
   },
   habitsList: {
-    flex: 1,
+    width: '100%',
   },
   fabContainer: {
     position: 'absolute',
