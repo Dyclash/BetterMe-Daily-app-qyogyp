@@ -9,10 +9,17 @@ export function useHabits() {
   const [loading, setLoading] = useState(true);
 
   const loadHabits = useCallback(async () => {
+    console.log('Loading habits...');
     setLoading(true);
-    const loadedHabits = await habitStorage.getHabits();
-    setHabits(loadedHabits);
-    setLoading(false);
+    try {
+      const loadedHabits = await habitStorage.getHabits();
+      console.log('Loaded habits:', loadedHabits.length);
+      setHabits(loadedHabits);
+    } catch (error) {
+      console.log('Error loading habits:', error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -20,18 +27,36 @@ export function useHabits() {
   }, [loadHabits]);
 
   const addHabit = useCallback(async (habit: Habit) => {
-    await habitStorage.addHabit(habit);
-    await loadHabits();
+    console.log('Adding habit:', habit.name);
+    try {
+      await habitStorage.addHabit(habit);
+      console.log('Habit added to storage, reloading...');
+      await loadHabits();
+    } catch (error) {
+      console.log('Error adding habit:', error);
+    }
   }, [loadHabits]);
 
   const updateHabit = useCallback(async (habit: Habit) => {
-    await habitStorage.updateHabit(habit);
-    await loadHabits();
+    console.log('Updating habit:', habit.name);
+    try {
+      await habitStorage.updateHabit(habit);
+      console.log('Habit updated in storage, reloading...');
+      await loadHabits();
+    } catch (error) {
+      console.log('Error updating habit:', error);
+    }
   }, [loadHabits]);
 
   const deleteHabit = useCallback(async (habitId: string) => {
-    await habitStorage.deleteHabit(habitId);
-    await loadHabits();
+    console.log('Deleting habit:', habitId);
+    try {
+      await habitStorage.deleteHabit(habitId);
+      console.log('Habit deleted from storage, reloading...');
+      await loadHabits();
+    } catch (error) {
+      console.log('Error deleting habit:', error);
+    }
   }, [loadHabits]);
 
   const toggleHabitCompletion = useCallback(async (habitId: string) => {

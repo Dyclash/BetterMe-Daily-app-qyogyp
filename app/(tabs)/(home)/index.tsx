@@ -1,7 +1,7 @@
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, StyleSheet, ScrollView, Pressable, Text, ActivityIndicator, Platform, useWindowDimensions } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { colors } from '@/styles/commonStyles';
 import { useHabits } from '@/hooks/useHabits';
 import { HabitCard } from '@/components/HabitCard';
@@ -20,7 +20,7 @@ import { useEffect } from 'react';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { habits, loading, toggleHabitCompletion } = useHabits();
+  const { habits, loading, toggleHabitCompletion, refreshHabits } = useHabits();
   const { width: screenWidth } = useWindowDimensions();
   
   const fabScale = useSharedValue(1);
@@ -34,6 +34,14 @@ export default function HomeScreen() {
   };
   const fabSize = isSmallScreen ? 60 : 68;
   const fabBottom = isSmallScreen ? 90 : 100;
+
+  // Refresh habits when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      console.log('Home screen focused, refreshing habits...');
+      refreshHabits();
+    }, [refreshHabits])
+  );
 
   useEffect(() => {
     // Subtle pulsing animation for FAB
