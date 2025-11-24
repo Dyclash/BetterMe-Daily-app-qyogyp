@@ -66,33 +66,62 @@ export default function HabitDetailsScreen() {
   };
 
   const handleDelete = () => {
+    console.log('Delete button pressed for habit:', habit?.name);
+    
     deleteButtonScale.value = withSpring(0.9, { damping: 10 });
     setTimeout(() => {
       deleteButtonScale.value = withSpring(1, { damping: 10 });
     }, 100);
 
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+
     if (Platform.OS === 'web') {
-      const confirmed = window.confirm('Are you sure you want to delete this habit?');
+      const confirmed = window.confirm('Are you sure you want to delete this habit? This action cannot be undone.');
       if (confirmed && habit) {
-        deleteHabit(habit.id);
-        router.replace('/(tabs)/(home)/');
+        console.log('Web: Deleting habit:', habit.id);
+        deleteHabit(habit.id).then(() => {
+          console.log('Web: Habit deleted, navigating back');
+          router.replace('/(tabs)/(home)/');
+        }).catch((error) => {
+          console.log('Web: Error deleting habit:', error);
+        });
       }
     } else {
       Alert.alert(
         'Delete Habit',
         'Are you sure you want to delete this habit? This action cannot be undone.',
         [
-          { text: 'Cancel', style: 'cancel' },
+          { 
+            text: 'Cancel', 
+            style: 'cancel',
+            onPress: () => {
+              console.log('Delete cancelled');
+            }
+          },
           {
             text: 'Delete',
             style: 'destructive',
             onPress: async () => {
               if (habit) {
-                await deleteHabit(habit.id);
-                if (Platform.OS !== 'web') {
-                  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                console.log('Native: Deleting habit:', habit.id);
+                try {
+                  await deleteHabit(habit.id);
+                  console.log('Native: Habit deleted successfully');
+                  
+                  if (Platform.OS !== 'web') {
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                  }
+                  
+                  // Navigate back to home
+                  router.replace('/(tabs)/(home)/');
+                } catch (error) {
+                  console.log('Native: Error deleting habit:', error);
+                  Alert.alert('Error', 'Failed to delete habit. Please try again.');
                 }
-                router.replace('/(tabs)/(home)/');
+              } else {
+                console.log('Native: No habit found to delete');
               }
             },
           },
