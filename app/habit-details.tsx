@@ -321,7 +321,10 @@ export default function HabitDetailsScreen() {
                 .slice(0, 10)
                 .map((completion, index) => (
                   <React.Fragment key={index}>
-                    <View style={styles.activityItem}>
+                    <View style={[
+                      styles.activityItem,
+                      index === Math.min(9, habit.completions.length - 1) && { borderBottomWidth: 0 }
+                    ]}>
                       <Text style={styles.activityDate}>
                         {new Date(completion.date).toLocaleDateString()}
                       </Text>
@@ -381,7 +384,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 140,
+    paddingBottom: 180,
   },
   habitHeader: {
     padding: 40,
@@ -492,6 +495,7 @@ const styles = StyleSheet.create({
   recentActivity: {
     marginTop: 28,
     paddingHorizontal: 20,
+    marginBottom: 40,
   },
   sectionTitle: {
     fontWeight: '900',
