@@ -77,15 +77,12 @@ export default function HomeScreen() {
       <React.Fragment>
         <Stack.Screen
           options={{
-            title: 'My Habits',
-            headerLargeTitle: true,
+            title: '',
+            headerLargeTitle: false,
             headerStyle: {
               backgroundColor: colors.background,
             },
             headerTintColor: colors.text,
-            headerLargeTitleStyle: {
-              color: colors.text,
-            },
           }}
         />
         <View style={[styles.container, styles.centerContent]}>
@@ -99,15 +96,12 @@ export default function HomeScreen() {
     <React.Fragment>
       <Stack.Screen
         options={{
-          title: 'My Habits',
-          headerLargeTitle: true,
+          title: '',
+          headerLargeTitle: false,
           headerStyle: {
             backgroundColor: colors.background,
           },
           headerTintColor: colors.text,
-          headerLargeTitleStyle: {
-            color: colors.text,
-          },
         }}
       />
       <View style={styles.container}>

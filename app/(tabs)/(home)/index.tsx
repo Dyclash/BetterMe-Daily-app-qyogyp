@@ -28,10 +28,6 @@ export default function HomeScreen() {
 
   // Responsive sizing
   const isSmallScreen = screenWidth < 375;
-  const headerFontSize = {
-    title: isSmallScreen ? 32 : 38,
-    subtitle: isSmallScreen ? 14 : 16,
-  };
   const fabSize = isSmallScreen ? 60 : 68;
   const fabBottom = isSmallScreen ? 90 : 100;
 
@@ -91,16 +87,6 @@ export default function HomeScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
-          <Text style={[styles.headerTitle, { fontSize: headerFontSize.title }]}>
-            My Habits
-          </Text>
-          <View style={styles.headerUnderline} />
-          <Text style={[styles.headerSubtitle, { fontSize: headerFontSize.subtitle }]}>
-            Build better habits, one day at a time
-          </Text>
-        </View>
-
         {habits.length === 0 ? (
           <EmptyState
             icon="🎯"
@@ -165,33 +151,6 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === 'android' ? 64 : 24,
     paddingHorizontal: 20,
     paddingBottom: 160,
-  },
-  header: {
-    marginBottom: 32,
-    paddingHorizontal: 4,
-  },
-  headerTitle: {
-    fontWeight: '900',
-    color: colors.text,
-    marginBottom: 8,
-    letterSpacing: 1,
-  },
-  headerUnderline: {
-    width: 60,
-    height: 4,
-    backgroundColor: colors.primary,
-    borderRadius: 2,
-    marginBottom: 12,
-    shadowColor: colors.neonBlue,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 10,
-    elevation: 4,
-  },
-  headerSubtitle: {
-    color: colors.textSecondary,
-    lineHeight: 24,
-    letterSpacing: 0.3,
   },
   habitsList: {
     width: '100%',
