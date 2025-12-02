@@ -1,5 +1,4 @@
 
-
 import React from 'react';
 import { Stack } from 'expo-router';
 import FloatingTabBar, { TabBarItem } from '@/components/FloatingTabBar';
@@ -10,13 +9,13 @@ export default function TabLayout() {
       name: '(home)',
       route: '/(tabs)/(home)/',
       label: 'Habits',
-      image_source: require('@/assets/images/6cb9802c-37e5-40d5-9468-27fe8aa377b8.png'),
+      image_source: require('@/assets/images/final_quest_240x240.png'),
     },
     {
       name: 'profile',
       route: '/(tabs)/profile',
       label: 'Profile',
-      image_source: require('@/assets/images/6cb9802c-37e5-40d5-9468-27fe8aa377b8.png'),
+      image_source: require('@/assets/images/final_quest_240x240.png'),
     },
   ];
 
