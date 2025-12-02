@@ -1,16 +1,17 @@
+
 {
   "expo": {
     "name": "BetterMe Daily",
     "slug": "BetterMe Daily",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/natively-dark.png",
+    "icon": "./assets/images/d3e3b13e-9a90-4c24-b59f-751d92e5ce19.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/natively-dark.png",
+      "image": "./assets/images/d3e3b13e-9a90-4c24-b59f-751d92e5ce19.png",
       "resizeMode": "contain",
-      "backgroundColor": "#000000"
+      "backgroundColor": "#FF5A5F"
     },
     "ios": {
       "supportsTablet": true,
@@ -21,14 +22,14 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/natively-dark.png",
-        "backgroundColor": "#000000"
+        "foregroundImage": "./assets/images/d3e3b13e-9a90-4c24-b59f-751d92e5ce19.png",
+        "backgroundColor": "#FF5A5F"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.anonymous.bettermedaily"
     },
     "web": {
-      "favicon": "./assets/images/final_quest_240x240.png",
+      "favicon": "./assets/images/d3e3b13e-9a90-4c24-b59f-751d92e5ce19.png",
       "bundler": "metro"
     },
     "plugins": [
