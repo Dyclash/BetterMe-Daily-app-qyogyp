@@ -44,7 +44,7 @@ export default function ProfileScreen() {
         >
           <View style={styles.avatarContainer}>
             <Image
-              source={require('@/assets/images/6cb9802c-37e5-40d5-9468-27fe8aa377b8.png')}
+              source={require('@/assets/images/88a0b5bf-d788-45a4-aade-c41418392a30.png')}
               style={styles.avatarImage}
             />
           </View>
