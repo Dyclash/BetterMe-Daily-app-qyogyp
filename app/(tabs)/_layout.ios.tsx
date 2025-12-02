@@ -9,13 +9,13 @@ export default function TabLayout() {
       name: '(home)',
       route: '/(tabs)/(home)/',
       label: 'Habits',
-      image_source: require('@/assets/images/final_quest_240x240.png'),
+      image_source: require('@/assets/images/831992cc-9b7a-4198-8f35-1c73ec8550eb.png'),
     },
     {
       name: 'profile',
       route: '/(tabs)/profile',
       label: 'Profile',
-      image_source: require('@/assets/images/final_quest_240x240.png'),
+      image_source: require('@/assets/images/831992cc-9b7a-4198-8f35-1c73ec8550eb.png'),
     },
   ];
 
