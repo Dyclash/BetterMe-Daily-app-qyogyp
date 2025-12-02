@@ -1,7 +1,7 @@
 
+
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { Stack } from 'expo-router';
+import { View, Text, StyleSheet, ScrollView, Platform, Image } from 'react-native';
 import { colors } from '@/styles/commonStyles';
 import { useHabits } from '@/hooks/useHabits';
 import { IconSymbol } from '@/components/IconSymbol';
@@ -32,137 +32,125 @@ export default function ProfileScreen() {
   }, 0);
 
   return (
-    <React.Fragment>
-      <Stack.Screen
-        options={{
-          title: 'Profile',
-          headerLargeTitle: true,
-          headerStyle: {
-            backgroundColor: colors.background,
-          },
-          headerTintColor: colors.text,
-          headerLargeTitleStyle: {
-            color: colors.text,
-          },
-        }}
-      />
-      <View style={styles.container}>
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
+    <View style={styles.container}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <Animated.View 
+          entering={FadeInDown.duration(600).springify()}
+          style={styles.header}
         >
-          <Animated.View 
-            entering={FadeInDown.duration(600).springify()}
-            style={styles.header}
-          >
-            <View style={styles.avatarContainer}>
-              <Text style={styles.avatarEmoji}>🎯</Text>
-            </View>
-            <Text style={styles.userName}>BetterMe Daily</Text>
-            <Text style={styles.userSubtitle}>Building better habits</Text>
-          </Animated.View>
-
-          <View style={styles.statsGrid}>
-            <Animated.View 
-              entering={FadeInDown.delay(100).duration(600).springify()}
-              style={styles.statCard}
-            >
-              <IconSymbol
-                ios_icon_name="list.bullet"
-                android_material_icon_name="list"
-                size={32}
-                color={colors.primary}
-              />
-              <Text style={styles.statValue}>{totalHabits}</Text>
-              <Text style={styles.statLabel}>Total Habits</Text>
-            </Animated.View>
-
-            <Animated.View 
-              entering={FadeInDown.delay(200).duration(600).springify()}
-              style={styles.statCard}
-            >
-              <IconSymbol
-                ios_icon_name="checkmark.circle.fill"
-                android_material_icon_name="check-circle"
-                size={32}
-                color={colors.success}
-              />
-              <Text style={styles.statValue}>{totalCompletions}</Text>
-              <Text style={styles.statLabel}>Completions</Text>
-            </Animated.View>
-
-            <Animated.View 
-              entering={FadeInDown.delay(300).duration(600).springify()}
-              style={styles.statCard}
-            >
-              <IconSymbol
-                ios_icon_name="flame.fill"
-                android_material_icon_name="local-fire-department"
-                size={32}
-                color={colors.accent}
-              />
-              <Text style={styles.statValue}>{averageStreak}</Text>
-              <Text style={styles.statLabel}>Avg Streak</Text>
-            </Animated.View>
-
-            <Animated.View 
-              entering={FadeInDown.delay(400).duration(600).springify()}
-              style={styles.statCard}
-            >
-              <IconSymbol
-                ios_icon_name="trophy.fill"
-                android_material_icon_name="emoji-events"
-                size={32}
-                color={colors.warning}
-              />
-              <Text style={styles.statValue}>{bestStreak}</Text>
-              <Text style={styles.statLabel}>Best Streak</Text>
-            </Animated.View>
+          <View style={styles.avatarContainer}>
+            <Image
+              source={require('@/assets/images/6cb9802c-37e5-40d5-9468-27fe8aa377b8.png')}
+              style={styles.avatarImage}
+            />
           </View>
+          <Text style={styles.userName}>BetterMe Daily</Text>
+          <Text style={styles.userSubtitle}>Building better habits</Text>
+        </Animated.View>
 
+        <View style={styles.statsGrid}>
           <Animated.View 
-            entering={FadeInDown.delay(500).duration(600).springify()}
-            style={styles.section}
+            entering={FadeInDown.delay(100).duration(600).springify()}
+            style={styles.statCard}
           >
-            <Text style={styles.sectionTitle}>About</Text>
-            <View style={styles.card}>
-              <Text style={styles.aboutText}>
-                Welcome to BetterMe Daily! This app helps you build and maintain positive habits by tracking your daily progress.
-              </Text>
-              <Text style={styles.aboutText}>
-                Set goals, track your streaks, and watch yourself grow one day at a time.
-              </Text>
-            </View>
+            <IconSymbol
+              ios_icon_name="list.bullet"
+              android_material_icon_name="list"
+              size={32}
+              color={colors.primary}
+            />
+            <Text style={styles.statValue}>{totalHabits}</Text>
+            <Text style={styles.statLabel}>Total Habits</Text>
           </Animated.View>
 
           <Animated.View 
-            entering={FadeInDown.delay(600).duration(600).springify()}
-            style={styles.section}
+            entering={FadeInDown.delay(200).duration(600).springify()}
+            style={styles.statCard}
           >
-            <Text style={styles.sectionTitle}>Tips for Success</Text>
-            <View style={styles.card}>
-              <View style={styles.tipItem}>
-                <Text style={styles.tipEmoji}>💡</Text>
-                <Text style={styles.tipText}>Start small - consistency beats intensity</Text>
-              </View>
-              <View style={styles.tipItem}>
-                <Text style={styles.tipEmoji}>📅</Text>
-                <Text style={styles.tipText}>Track daily to build momentum</Text>
-              </View>
-              <View style={styles.tipItem}>
-                <Text style={styles.tipEmoji}>🎯</Text>
-                <Text style={styles.tipText}>Focus on a few key habits at a time</Text>
-              </View>
-              <View style={styles.tipItem}>
-                <Text style={styles.tipEmoji}>🔥</Text>
-                <Text style={styles.tipText}>Don&apos;t break the chain!</Text>
-              </View>
-            </View>
+            <IconSymbol
+              ios_icon_name="checkmark.circle.fill"
+              android_material_icon_name="check-circle"
+              size={32}
+              color={colors.success}
+            />
+            <Text style={styles.statValue}>{totalCompletions}</Text>
+            <Text style={styles.statLabel}>Completions</Text>
           </Animated.View>
-        </ScrollView>
-      </View>
-    </React.Fragment>
+
+          <Animated.View 
+            entering={FadeInDown.delay(300).duration(600).springify()}
+            style={styles.statCard}
+          >
+            <IconSymbol
+              ios_icon_name="flame.fill"
+              android_material_icon_name="local-fire-department"
+              size={32}
+              color={colors.accent}
+            />
+            <Text style={styles.statValue}>{averageStreak}</Text>
+            <Text style={styles.statLabel}>Avg Streak</Text>
+          </Animated.View>
+
+          <Animated.View 
+            entering={FadeInDown.delay(400).duration(600).springify()}
+            style={styles.statCard}
+          >
+            <IconSymbol
+              ios_icon_name="trophy.fill"
+              android_material_icon_name="emoji-events"
+              size={32}
+              color={colors.warning}
+            />
+            <Text style={styles.statValue}>{bestStreak}</Text>
+            <Text style={styles.statLabel}>Best Streak</Text>
+          </Animated.View>
+        </View>
+
+        <Animated.View 
+          entering={FadeInDown.delay(500).duration(600).springify()}
+          style={styles.section}
+        >
+          <Text style={styles.sectionTitle}>About</Text>
+          <View style={styles.card}>
+            <Text style={styles.aboutText}>
+              Welcome to BetterMe Daily! This app helps you build and maintain positive habits by tracking your daily progress.
+            </Text>
+            <Text style={styles.aboutText}>
+              Set goals, track your streaks, and watch yourself grow one day at a time.
+            </Text>
+          </View>
+        </Animated.View>
+
+        <Animated.View 
+          entering={FadeInDown.delay(600).duration(600).springify()}
+          style={styles.section}
+        >
+          <Text style={styles.sectionTitle}>Tips for Success</Text>
+          <View style={styles.card}>
+            <View style={styles.tipItem}>
+              <Text style={styles.tipEmoji}>💡</Text>
+              <Text style={styles.tipText}>Start small - consistency beats intensity</Text>
+            </View>
+            <View style={styles.tipItem}>
+              <Text style={styles.tipEmoji}>📅</Text>
+              <Text style={styles.tipText}>Track daily to build momentum</Text>
+            </View>
+            <View style={styles.tipItem}>
+              <Text style={styles.tipEmoji}>🎯</Text>
+              <Text style={styles.tipText}>Focus on a few key habits at a time</Text>
+            </View>
+            <View style={styles.tipItem}>
+              <Text style={styles.tipEmoji}>🔥</Text>
+              <Text style={styles.tipText}>Don&apos;t break the chain!</Text>
+            </View>
+          </View>
+        </Animated.View>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -175,8 +163,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
+    paddingTop: Platform.OS === 'android' ? 56 : 24,
     paddingHorizontal: 20,
-    paddingTop: 16,
     paddingBottom: 120,
   },
   header: {
@@ -198,9 +186,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 24,
     elevation: 12,
+    overflow: 'hidden',
   },
-  avatarEmoji: {
-    fontSize: 56,
+  avatarImage: {
+    width: 100,
+    height: 100,
+    resizeMode: 'contain',
   },
   userName: {
     fontSize: 32,
@@ -229,11 +220,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: colors.border,
-    shadowColor: colors.neonBlue,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
+    ...Platform.select({
+      web: {
+        boxShadow: `0 0 30px ${colors.neonBlue}20, 0 8px 24px rgba(0, 0, 0, 0.4)`,
+      },
+      default: {
+        shadowColor: colors.neonBlue,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 12,
+        elevation: 8,
+      }
+    }),
   },
   statValue: {
     fontSize: 36,
@@ -265,11 +263,18 @@ const styles = StyleSheet.create({
     padding: 24,
     borderWidth: 1,
     borderColor: colors.border,
-    shadowColor: colors.neonBlue,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
+    ...Platform.select({
+      web: {
+        boxShadow: `0 0 30px ${colors.neonBlue}20, 0 8px 24px rgba(0, 0, 0, 0.4)`,
+      },
+      default: {
+        shadowColor: colors.neonBlue,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 12,
+        elevation: 8,
+      }
+    }),
   },
   aboutText: {
     fontSize: 17,

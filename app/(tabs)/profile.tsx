@@ -1,6 +1,7 @@
 
+
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Platform, Image } from 'react-native';
 import { colors } from '@/styles/commonStyles';
 import { useHabits } from '@/hooks/useHabits';
 import { IconSymbol } from '@/components/IconSymbol';
@@ -42,7 +43,10 @@ export default function ProfileScreen() {
           style={styles.header}
         >
           <View style={styles.avatarContainer}>
-            <Text style={styles.avatarEmoji}>🎯</Text>
+            <Image
+              source={require('@/assets/images/6cb9802c-37e5-40d5-9468-27fe8aa377b8.png')}
+              style={styles.avatarImage}
+            />
           </View>
           <Text style={styles.userName}>BetterMe Daily</Text>
           <Text style={styles.userSubtitle}>Building better habits</Text>
@@ -182,9 +186,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 24,
     elevation: 12,
+    overflow: 'hidden',
   },
-  avatarEmoji: {
-    fontSize: 56,
+  avatarImage: {
+    width: 100,
+    height: 100,
+    resizeMode: 'contain',
   },
   userName: {
     fontSize: 32,

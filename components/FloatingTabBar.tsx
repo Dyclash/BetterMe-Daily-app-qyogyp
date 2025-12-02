@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import {
   View,
@@ -7,10 +8,10 @@ import {
   StyleSheet,
   Platform,
   useWindowDimensions,
+  Image,
 } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { IconSymbol } from '@/components/IconSymbol';
 import { BlurView } from 'expo-blur';
 import { useTheme } from '@react-navigation/native';
 import Animated, {
@@ -19,15 +20,14 @@ import Animated, {
   withSpring,
   interpolate,
 } from 'react-native-reanimated';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Href } from 'expo-router';
 import { colors } from '@/styles/commonStyles';
 
 export interface TabBarItem {
   name: string;
   route: Href;
-  icon: keyof typeof MaterialIcons.glyphMap;
   label: string;
+  image_source?: any;
 }
 
 interface FloatingTabBarProps {
@@ -197,12 +197,17 @@ export default function FloatingTabBar({
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   >
                     <View style={styles.tabContent}>
-                      <IconSymbol
-                        android_material_icon_name={tab.icon}
-                        ios_icon_name={tab.icon}
-                        size={iconSize}
-                        color={isActive ? colors.primary : colors.textSecondary}
-                      />
+                      {tab.image_source && (
+                        <Image
+                          source={tab.image_source}
+                          style={{
+                            width: iconSize,
+                            height: iconSize,
+                            resizeMode: 'contain',
+                            opacity: isActive ? 1 : 0.6,
+                          }}
+                        />
+                      )}
                       <Text
                         style={[
                           styles.tabLabel,

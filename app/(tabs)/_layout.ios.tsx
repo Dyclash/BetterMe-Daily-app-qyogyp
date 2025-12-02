@@ -1,19 +1,37 @@
 
+
 import React from 'react';
-import { NativeTabs, Icon, Label } from 'expo-router/unstable-native-tabs';
-import { colors } from '@/styles/commonStyles';
+import { Stack } from 'expo-router';
+import FloatingTabBar, { TabBarItem } from '@/components/FloatingTabBar';
 
 export default function TabLayout() {
+  const tabs: TabBarItem[] = [
+    {
+      name: '(home)',
+      route: '/(tabs)/(home)/',
+      label: 'Habits',
+      image_source: require('@/assets/images/6cb9802c-37e5-40d5-9468-27fe8aa377b8.png'),
+    },
+    {
+      name: 'profile',
+      route: '/(tabs)/profile',
+      label: 'Profile',
+      image_source: require('@/assets/images/6cb9802c-37e5-40d5-9468-27fe8aa377b8.png'),
+    },
+  ];
+
   return (
-    <NativeTabs>
-      <NativeTabs.Trigger key="home" name="(home)">
-        <Icon sf="checkmark.circle.fill" />
-        <Label>Habits</Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger key="profile" name="profile">
-        <Icon sf="person.fill" />
-        <Label>Profile</Label>
-      </NativeTabs.Trigger>
-    </NativeTabs>
+    <>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          animation: 'none',
+        }}
+      >
+        <Stack.Screen key="home" name="(home)" />
+        <Stack.Screen key="profile" name="profile" />
+      </Stack>
+      <FloatingTabBar tabs={tabs} />
+    </>
   );
 }
